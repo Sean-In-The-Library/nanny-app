@@ -280,3 +280,10 @@ Active Tina email feedback follow-up, 2026-05-31:
 - Privacy decision: admin reminders are parent-facing in the UI; Faith's dashboard and bottom navigation do not surface the Admin area in this pass.
 - Documentation update: `README.md` and `plan.md` now include nanny admin reminders.
 - Verification after implementation: `npm run lint`, `npm run build`, and `git diff --check` passed locally.
+
+Active Tina nanny-preview request, 2026-05-31:
+
+- Sean requested that Tina be able to toggle into the nanny view to see what Faith's dashboard would look like.
+- Implementation decision: add a Tina-only dashboard segmented control rather than changing Tina's actual authenticated role.
+- Parent mode keeps Tina's command center and parent/admin dashboard items visible.
+- Nanny preview mode hides parent/admin dashboard items and the Tina command center, then shows the same simplified nanny-facing dashboard intro Faith sees.

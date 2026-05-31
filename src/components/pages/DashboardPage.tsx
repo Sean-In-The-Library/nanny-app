@@ -70,6 +70,11 @@ export function DashboardPage() {
   const { data, loading, saving, error, saveData, updateData } = useAppData();
   const { user } = useSession();
   const [activeBucket, setActiveBucket] = useState<DashboardBucket>("today");
+  const [viewMode, setViewMode] = useState<"parent" | "nanny">("parent");
+
+  const canPreviewNannyView = user?.name === "Tina";
+  const isNannyPreview = canPreviewNannyView && viewMode === "nanny";
+  const effectiveIsParent = user?.role === "parent" && !isNannyPreview;
 
   async function resolveNote(id: string) {
     await updateData((current) => ({
@@ -155,12 +160,17 @@ export function DashboardPage() {
   return (
     <AppShell>
       <PageHeader eyebrow="Home" title="Family priority map">
-        <Link
-          href="/notes"
-          className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2f83c5] px-4 text-sm font-black text-white shadow-sm transition hover:bg-[#246ca3]"
-        >
-          Add Note
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          {canPreviewNannyView ? (
+            <ViewModeToggle value={viewMode} onChange={setViewMode} />
+          ) : null}
+          <Link
+            href="/notes"
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2f83c5] px-4 text-sm font-black text-white shadow-sm transition hover:bg-[#246ca3]"
+          >
+            Add Note
+          </Link>
+        </div>
       </PageHeader>
 
       {loading || !data ? (
@@ -169,7 +179,7 @@ export function DashboardPage() {
         </div>
       ) : (
         <DashboardContent
-          dashboard={getDashboardData(data, { includeAdmin: user?.role === "parent" })}
+          dashboard={getDashboardData(data, { includeAdmin: effectiveIsParent })}
           data={data}
           error={error}
           saving={saving}
@@ -177,7 +187,8 @@ export function DashboardPage() {
           onBucketChange={setActiveBucket}
           onItemAction={handleItemAction}
           onSave={saveData}
-          isParent={user?.role === "parent"}
+          isNannyPreview={isNannyPreview}
+          isParent={effectiveIsParent}
         />
       )}
     </AppShell>
@@ -190,6 +201,7 @@ function DashboardContent({
   error,
   saving,
   activeBucket,
+  isNannyPreview,
   isParent,
   onBucketChange,
   onItemAction,
@@ -200,6 +212,7 @@ function DashboardContent({
   error: string | null;
   saving: boolean;
   activeBucket: DashboardBucket;
+  isNannyPreview: boolean;
   isParent: boolean;
   onBucketChange: (bucket: DashboardBucket) => void;
   onItemAction: (item: DashboardItem) => Promise<void>;
@@ -218,6 +231,8 @@ function DashboardContent({
         activeBucket={activeBucket}
         onBucketChange={onBucketChange}
       />
+
+      {isNannyPreview ? <NannyPreviewBanner /> : null}
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(330px,0.85fr)] xl:items-start">
         <main className="space-y-4">
@@ -254,6 +269,55 @@ function DashboardContent({
         </aside>
       </div>
     </div>
+  );
+}
+
+function ViewModeToggle({
+  onChange,
+  value,
+}: {
+  onChange: (value: "parent" | "nanny") => void;
+  value: "parent" | "nanny";
+}) {
+  return (
+    <div
+      aria-label="Dashboard view mode"
+      className="grid grid-cols-2 rounded-xl border border-[#dfd1bd] bg-white p-1 shadow-sm"
+      role="group"
+    >
+      {(["parent", "nanny"] as const).map((mode) => (
+        <button
+          key={mode}
+          type="button"
+          onClick={() => onChange(mode)}
+          className={`min-h-9 rounded-lg px-3 text-sm font-black transition ${
+            value === mode
+              ? "bg-[#2f83c5] text-white"
+              : "text-[#536076] hover:bg-[#f4eadc]"
+          }`}
+        >
+          {mode === "parent" ? "Parent" : "Nanny preview"}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function NannyPreviewBanner() {
+  return (
+    <section className="rounded-2xl border border-[#b8ddb9] bg-[#edf8ed] p-4 shadow-sm">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[#3a6b42]">
+            Tina previewing Faith&apos;s view
+          </p>
+          <p className="mt-1 text-sm font-semibold leading-6 text-[#3a6b42]">
+            Admin reminders and parent-only command tools are hidden. The feed
+            now reflects the simplified nanny-facing dashboard.
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }
 
