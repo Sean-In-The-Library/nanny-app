@@ -220,3 +220,9 @@ Active persistence update, 2026-05-30 20:43 America/Phoenix:
 - Implementation update: `src/lib/storage.ts` now uses Neon/Postgres when `DATABASE_URL` or `POSTGRES_URL` is present, falls back to Upstash Redis when configured, and otherwise uses the local file fallback.
 - Documentation update: `.env.example` and `README.md` now list `DATABASE_URL` as the preferred production persistence setting.
 - Vercel env check now shows `DATABASE_URL`, `POSTGRES_URL`, and related Neon variables attached to production and preview.
+- Verification after the storage update: `npm run lint` passed and `npm run build` passed locally.
+- GitHub push: commit `12ceb58` (`Add durable Neon storage`) was pushed to `origin/main`.
+- Vercel CLI production deployment: `dpl_5K7ehdASktmV7wtRK7zBP9h5ziVY` is `READY`; Vercel plugin confirms `nanny-app.aistudioprojects.com` remains attached to the `nanny-app-8gy6` project.
+- Production custom-domain smoke after Neon deployment passed: `/login` returns 200, unauthenticated `/` redirects to `/login?next=%2F`, Tina login returns the configured profile, `/api/data` read works, a temporary note write/read/restore worked, dictation actionization returned draft items, and care manual summarization returned a summary with follow-up questions.
+- Production Faith smoke after Neon deployment: Faith login returns role `nanny`; the parent command center is not present in the server-rendered dashboard HTML.
+- Remaining blocker: production transcription still returns OpenAI 401, "You do not have access to the organization tied to the API key." The app code and upload UI are wired correctly, but the production OpenAI key or organization access must be fixed before Tina can use live audio transcription.
