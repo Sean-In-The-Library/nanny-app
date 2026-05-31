@@ -3,4 +3,6 @@
 .next
 node_modules
 .vercel
+.data/
 scaffold-app/
+npm-debug.log*

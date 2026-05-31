@@ -9,7 +9,13 @@ The app will live in this existing GitHub repository:
 
 https://github.com/Sean-In-The-Library/nanny-app
 
-We are not deploying to Vercel immediately. First, we will build and test the app locally and push working code to GitHub. Once there is something worth deploying, we will connect the GitHub repo to Vercel and deploy from there.
+The GitHub repository is now connected to Vercel production:
+
+```text
+https://nanny-app-8gy6.vercel.app
+```
+
+New production updates should be pushed to the `main` branch so Vercel can build them from GitHub.
 
 The app should use an OpenRouter API key through an environment variable for AI-assisted features, especially summarizing dictated care notes into clean care manuals.
 
@@ -66,15 +72,21 @@ Do not use OAuth, Clerk, Auth0, Supabase Auth, or any complex authentication sys
 
 ```bash
 OPENROUTER_API_KEY=your_openrouter_key_here
+OPENAI_API_KEY=your_openai_key_here
+APP_SESSION_SECRET=generate_a_long_random_secret
 
 APP_PASSWORD_SEAN=your_password_here
 APP_PASSWORD_TINA=your_password_here
 APP_PASSWORD_FAITH=your_password_here
+
+UPSTASH_REDIS_REST_URL=your_upstash_rest_url
+UPSTASH_REDIS_REST_TOKEN=your_upstash_rest_token
+APP_PUBLIC_URL=https://nanny-app-8gy6.vercel.app
 ````
 
 ### Preferred Auth Implementation
 
-Use a server-side login route and protected middleware.
+Use a server-side login route and protected Next.js proxy.
 
 Suggested routes:
 
@@ -87,7 +99,7 @@ Suggested files:
 
 ```text
 src/lib/auth.ts
-middleware.ts
+src/proxy.ts
 ```
 
 The password should never be committed to GitHub.
@@ -100,17 +112,16 @@ Use:
 * React
 * TypeScript
 * Tailwind CSS
-* Vercel, when ready
+* Vercel production
 * GitHub
 * OpenRouter API
-* Simple persistence for MVP
+* Upstash Redis for Vercel persistence, with local file persistence in development
 
-For persistence, start as simple as possible. If Vercel deployment requires persistent storage beyond local development, use one of:
+For persistence, start as simple as possible. On Vercel, use a marketplace-backed store such as:
 
-* Vercel Postgres
 * Neon
 * Supabase database only, not Supabase Auth
-* Vercel KV
+* Upstash Redis
 
 Do not overbuild the database layer in the first pass.
 
@@ -617,7 +628,7 @@ Optional later:
     openrouter.ts
     storage.ts
     dateUtils.ts
-middleware.ts
+src/proxy.ts
 .env.example
 README.md
 ```
@@ -733,7 +744,7 @@ src/lib/openrouter.ts
 * environment variables
 * how to run locally
 * how to test login
-* future Vercel deployment notes
+* Vercel deployment notes
 
 ### Required `.gitignore`
 
@@ -790,17 +801,13 @@ npm run dev
 * Code is pushed to GitHub.
 * README is accurate.
 
-## Agent 3: Testing, Browser QA, and Later Vercel Deployment
+## Agent 3: Testing, Browser QA, and Vercel Deployment
 
 ### Mission
 
-Test the app in the browser, verify it works locally, and prepare it for Vercel deployment when ready.
+Test the app in the browser, verify it works locally, and verify production builds on Vercel after pushes to `main`.
 
-Do not deploy to Vercel until there is something worth deploying.
-
-When ready, connect the GitHub repo to Vercel and deploy from the repo.
-
-### Responsibilities Before Vercel
+### Responsibilities
 
 1. Pull latest code from GitHub.
 2. Install dependencies.
@@ -944,35 +951,33 @@ Confirm:
 * No horizontal scrolling.
 * Login works on mobile.
 
-### Vercel Deployment, Later
+### Vercel Deployment
 
-Only after the app works locally and has useful functionality:
-
-1. Go to Vercel.
-2. Import the GitHub repo:
+The production project is already connected:
 
 ```text
-https://github.com/Sean-In-The-Library/nanny-app
+https://nanny-app-8gy6.vercel.app
 ```
 
-3. Configure project:
-
-   * Framework: Next.js
-   * Build command: `npm run build`
-   * Output: default
-4. Add environment variables:
+Before using real family data, add production environment variables:
 
    * `OPENROUTER_API_KEY`
+   * `OPENAI_API_KEY`
+   * `APP_SESSION_SECRET`
    * `APP_PASSWORD_SEAN`
    * `APP_PASSWORD_TINA`
    * `APP_PASSWORD_FAITH`
-   * any database or storage variables
-5. Deploy preview.
-6. Inspect build logs.
-7. Fix build errors.
-8. Test the Vercel deployment in browser.
-9. Test mobile layout.
-10. Promote to production when stable.
+   * `UPSTASH_REDIS_REST_URL`
+   * `UPSTASH_REDIS_REST_TOKEN`
+   * `APP_PUBLIC_URL`
+
+Deployment flow:
+
+1. Push verified code to `main`.
+2. Inspect Vercel build logs.
+3. Fix build errors.
+4. Test the Vercel deployment in browser.
+5. Test mobile layout.
 
 ### Vercel Acceptance Criteria
 
@@ -998,7 +1003,7 @@ Prioritize:
 4. Simple authentication
 5. Reliable local testing
 6. GitHub push
-7. Vercel deployment only when ready
+7. Vercel production verification
 ```
 
 Do not overbuild:
@@ -1091,14 +1096,12 @@ npm run lint
 * Push to GitHub.
 * Confirm repo is clean.
 
-### Phase 8: Vercel Deployment, Later
+### Phase 8: Vercel Deployment
 
-* Connect GitHub repo to Vercel.
 * Add environment variables.
-* Deploy.
+* Push to `main`.
 * Test production URL.
 * Fix build issues.
-* Promote when stable.
 
 ## Definition of Done
 
@@ -1126,8 +1129,8 @@ https://github.com/Sean-In-The-Library/nanny-app
   * milestones
 * Care manual generation works through OpenRouter.
 * Browser testing confirms desktop and mobile usability.
-* README explains setup, env vars, local testing, GitHub workflow, and later Vercel deployment.
-* Vercel deployment is deferred until the app has enough working functionality to justify deployment.
+* README explains setup, env vars, local testing, GitHub workflow, and Vercel deployment.
+* Vercel production deployment works from the GitHub `main` branch.
 
 ```
 ```
