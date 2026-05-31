@@ -24,7 +24,7 @@ https://github.com/Sean-In-The-Library/nanny-app
 Production deployment:
 
 ```text
-https://nanny-app-8gy6.vercel.app
+https://nanny-app.aistudioprojects.com
 ```
 
 Vercel project:
@@ -42,7 +42,7 @@ Current stack:
 - Upstash Redis is the intended production persistence layer.
 - Local development falls back to `.data/nanny-hub.json`.
 - OpenRouter powers care manual and dictation action-item generation.
-- OpenAI transcription endpoint supports browser audio dictation.
+- OpenAI `gpt-4o-transcribe` supports browser audio dictation for Tina's voice workflow.
 
 Required production environment variables:
 
@@ -57,8 +57,14 @@ OPENAI_API_KEY=
 OPENAI_TRANSCRIBE_MODEL=
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
-APP_PUBLIC_URL=https://nanny-app-8gy6.vercel.app
+APP_PUBLIC_URL=https://nanny-app.aistudioprojects.com
 ```
+
+Production env status as of 2026-05-31:
+
+- Added through Vercel CLI for production: `APP_PASSWORD_SEAN`, `APP_PASSWORD_TINA`, `APP_PASSWORD_FAITH`, `APP_SESSION_SECRET`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`, `OPENAI_API_KEY`, `OPENAI_TRANSCRIBE_MODEL`, and `APP_PUBLIC_URL`.
+- Not yet configured: `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+- Until Upstash is configured, production can run and save during a warm serverless session, but data should be treated as temporary.
 
 Tina review email should include masked login details only:
 
@@ -138,22 +144,40 @@ Current state:
 - The GitHub repository is connected to Vercel production.
 - The initial production deployment was showing the default Next.js starter screen.
 - The app implementation now includes auth routes, protected routing, storage, seeded data, dashboard rollups, editable source pages, Tina's dictation command center, care manual AI drafting, and audio transcription endpoints.
+- The requested production domain is `https://nanny-app.aistudioprojects.com`.
+- Vercel plugin confirmed the target project is `nanny-app-8gy6`, project id `prj_rpmOpZw5DpEB4nb7jDHD4zLTLk49`, under team `seans-projects-3ff264cf`.
+- Vercel CLI added `nanny-app.aistudioprojects.com` to the linked `nanny-app-8gy6` project; Vercel reports it will point to the latest production deployment.
+- The local folder has been reattached to GitHub `origin/main` at commit `3f6d887`.
 
 Immediate plan:
 
-1. Finish route wiring so every app route renders the full implementation.
-2. Add or update documentation for the Vercel-connected project.
-3. Run lint and production build.
-4. Commit and push to `main`.
-5. Verify Vercel production deployment.
-6. Email Tina with current state, goals, audio-driven work completed, three feedback questions, production URL, and masked login details.
-7. Schedule a morning feedback check and implementation follow-up.
+1. Update documentation for the custom production domain.
+2. Commit and push current changes to `main`.
+3. Deploy with Vercel CLI to production.
+4. Verify `https://nanny-app.aistudioprojects.com`.
+5. Confirm login, dashboard, CRUD, and AI endpoint behavior.
+6. Email Tina with current state, goals, audio-driven work completed, three feedback questions, production URL, and masked login details if Sean still wants that sent.
+7. Schedule a morning feedback check and implementation follow-up only if explicitly requested.
 
 Status:
 
-- Product and coordination document: complete.
-- Engineering verification: `npm run lint` passed; `npm run build` passed.
-- GitHub deployment trigger: pending.
+- Product and coordination document: updated in this pass.
+- Engineering verification: `npm run lint` passed and `npm run build` passed again after the coordination update.
+- Local API verification: Tina wrong-password login returns 401, Tina correct login returns the configured `tinakharrington@gmail.com` profile, protected data reads work with a session, and data PUT/restore works.
+- Local AI verification: dictation actionization returned three draft items after capping OpenRouter output tokens; care manual summarization returned a draft and questions.
+- Local voice transcription verification: generated WAV upload reached `/api/ai/transcribe`, but OpenAI returned 401, "You do not have access to the organization tied to the API key." The app code is wired to `gpt-4o-transcribe`, but the current `OPENAI_API_KEY` is not usable for transcription.
+- Browser verification: Playwright MCP failed to launch Chrome twice with exit code 13, so visual QA is not complete yet. HTTP/API verification is complete so far.
+- GitHub deployment trigger: pending current commit and push.
 - Vercel verification: pending.
-- Tina email: pending.
-- Morning feedback automation: pending.
+- Tina email: pending explicit approval.
+- Morning feedback automation: pending explicit request.
+
+Active handoff update, 2026-05-30 20:16 America/Phoenix:
+
+- Current agent reviewed this coordination file first, as requested.
+- Working tree already had uncommitted edits in `PROJECT_COORDINATION.md`, `README.md`, `src/app/api/login/route.ts`, `src/lib/auth.ts`, `src/lib/openrouter.ts`, and `src/lib/storage.ts`.
+- Existing diffs were inspected before any implementation edits.
+- `Get-Command vercel` found `C:\Users\seane\AppData\Roaming\npm\vercel.ps1`; `vercel --version` returned `51.7.0`, so the local CLI is currently usable in this shell.
+- Local runtime check: Node `v22.12.0`, npm `10.9.0`.
+- Verification rerun in this active pass: `npm run lint` passed; `npm run build` passed with Next.js `16.2.6` and 21 static pages generated.
+- Remaining gates before sharing with Tina: commit/push, production deploy and verification, and explicit Sean approval for email.

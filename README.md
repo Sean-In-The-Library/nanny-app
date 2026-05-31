@@ -4,7 +4,7 @@ Private, mobile-first family operations app for Sean, Tina, and Faith.
 
 Production target:
 
-- `https://nanny-app-8gy6.vercel.app`
+- `https://nanny-app.aistudioprojects.com`
 - Vercel project shown as `nanny-app-8gy6`
 - GitHub repository: `https://github.com/Sean-In-The-Library/nanny-app`
 
@@ -42,13 +42,13 @@ APP_PASSWORD_TINA=your_password_here
 APP_PASSWORD_FAITH=your_password_here
 APP_SESSION_SECRET=replace_with_a_long_random_secret
 
-APP_PUBLIC_URL=https://nanny-app-8gy6.vercel.app
+APP_PUBLIC_URL=https://nanny-app.aistudioprojects.com
 
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 ```
 
-`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are required before real family use on Vercel. Without them, the deployed app can load seeded data, but production saves are rejected instead of pretending temporary serverless storage is durable.
+`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are recommended before real family use on Vercel. Without them, the deployed app can save during a warm serverless session, but data may reset when Vercel rotates the function instance.
 
 Never commit `.env`, `.env.local`, API keys, or real passwords.
 
@@ -98,7 +98,7 @@ Required production env vars:
 - `APP_SESSION_SECRET`
 - `OPENROUTER_API_KEY`
 - `OPENAI_API_KEY`
-- `APP_PUBLIC_URL=https://nanny-app-8gy6.vercel.app`
+- `APP_PUBLIC_URL=https://nanny-app.aistudioprojects.com`
 
 Recommended production env vars:
 
@@ -117,7 +117,7 @@ vercel deploy --prod
 
 After deployment, test:
 
-- `https://nanny-app-8gy6.vercel.app/login`
+- `https://nanny-app.aistudioprojects.com/login`
 - Tina login
 - dashboard load
 - add/resolve a note

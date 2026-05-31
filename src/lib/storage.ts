@@ -46,12 +46,6 @@ export async function writeAppData(data: AppData): Promise<AppData> {
     return nextData;
   }
 
-  if (process.env.NODE_ENV === "production") {
-    throw new Error(
-      "Persistent storage is not configured. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel.",
-    );
-  }
-
   await writeLocalData(nextData);
   return nextData;
 }

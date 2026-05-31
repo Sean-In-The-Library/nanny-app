@@ -10,7 +10,7 @@ export const USERS: Record<UserName, AuthenticatedUser> = {
   },
   Tina: {
     name: "Tina",
-    email: "tina@example.local",
+    email: "tinakharrington@gmail.com",
     role: "parent",
   },
   Faith: {

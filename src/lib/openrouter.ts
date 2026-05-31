@@ -6,9 +6,11 @@ type OpenRouterMessage = {
 export async function callOpenRouterJson<T>({
   messages,
   fallbackModel = process.env.OPENROUTER_MODEL ?? "openai/gpt-4.1-mini",
+  maxTokens = 1200,
 }: {
   messages: OpenRouterMessage[];
   fallbackModel?: string;
+  maxTokens?: number;
 }): Promise<T> {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
@@ -27,6 +29,7 @@ export async function callOpenRouterJson<T>({
       model: fallbackModel,
       messages,
       temperature: 0.2,
+      max_tokens: maxTokens,
       response_format: { type: "json_object" },
     }),
   });
@@ -57,4 +60,3 @@ function parseJsonContent<T>(content: string): T {
     return JSON.parse(match[0]) as T;
   }
 }
-

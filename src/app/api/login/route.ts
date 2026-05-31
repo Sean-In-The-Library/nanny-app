@@ -20,13 +20,20 @@ export async function POST(request: Request) {
     );
   }
 
-  const { user, password } = parsed.data;
+  const { user, email, password } = parsed.data;
   const expectedPassword = getExpectedPassword(user);
 
   if (!expectedPassword) {
     return NextResponse.json(
       { error: `Missing ${user} password environment variable.` },
       { status: 500 },
+    );
+  }
+
+  if (user === "Tina" && email && email.toLowerCase() !== USERS.Tina.email) {
+    return NextResponse.json(
+      { error: "Use Tina's configured email for this login." },
+      { status: 401 },
     );
   }
 
