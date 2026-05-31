@@ -253,3 +253,13 @@ Active device-optimization feedback, 2026-05-31:
 - Production custom-domain smoke after the dashboard pass passed: `/login` returns 200, unauthenticated `/` redirects to `/login?next=%2F`, Tina login returns role `parent`, Faith login returns role `nanny`, `/api/data` read works, temporary note write/read/restore worked, and dictation actionization returned draft items.
 - Production logs check after smoke: Vercel logs showed 200 responses for `/api/login`, `/api/session`, `/api/data`, `/api/ai/actionize-dictation`, plus expected 307 for `/`.
 - Browser plugin limitation: Playwright browser verification still cannot launch Chrome in this desktop session; Chrome exits with code 13 before page load. HTTP/API and build verification are complete.
+
+Active branch consolidation request, 2026-05-31:
+
+- Sean requested merging all branches, committing, pushing to `main`, and deploying on Vercel.
+- Local branch audit before fetch showed only `main` and `origin/main`.
+- `git fetch --all --prune` completed; `git branch --all --verbose --no-abbrev` still showed only `main` and `origin/main`.
+- `git ls-remote --heads origin` showed only `refs/heads/main` at `cf207398eff94b29848979f0eb94a238514130eb`.
+- GitHub plugin branch search also returned only `main`.
+- `git pull --ff-only origin main` returned `Already up to date.`
+- Merge result: no non-main branches exist to merge; the deploy will use current `main` plus this coordination audit commit.
