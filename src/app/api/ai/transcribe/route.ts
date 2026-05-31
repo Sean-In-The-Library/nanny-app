@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+const MAX_TRANSCRIBE_UPLOAD_BYTES = 4 * 1024 * 1024;
+
 export async function POST(request: Request) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -19,9 +21,12 @@ export async function POST(request: Request) {
     );
   }
 
-  if (audio.size > 25 * 1024 * 1024) {
+  if (audio.size > MAX_TRANSCRIBE_UPLOAD_BYTES) {
     return NextResponse.json(
-      { error: "Audio or video files must be 25 MB or smaller." },
+      {
+        error:
+          "Audio or video files must be 4 MB or smaller until direct upload storage is configured.",
+      },
       { status: 400 },
     );
   }

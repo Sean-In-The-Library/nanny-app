@@ -12,6 +12,8 @@ type ActionizeResponse = {
   questions: string[];
 };
 
+const MAX_TRANSCRIBE_UPLOAD_BYTES = 4 * 1024 * 1024;
+
 export function TinaCommandCenter({
   data,
   saving,
@@ -115,6 +117,13 @@ export function TinaCommandCenter({
     event.currentTarget.value = "";
 
     if (!file) {
+      return;
+    }
+
+    if (file.size > MAX_TRANSCRIBE_UPLOAD_BYTES) {
+      setError(
+        "Use a recording under 4 MB for now. Longer iPhone videos need direct storage before transcription.",
+      );
       return;
     }
 

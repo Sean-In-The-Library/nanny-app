@@ -204,3 +204,6 @@ Active browser QA update, 2026-05-30 20:26 America/Phoenix:
 - Browser Faith login succeeded, but the nanny profile could see the Tina command center, which is not appropriate for a nanny-facing experience.
 - Cross-profile handoff of a saved test item did not reliably appear in a fresh Faith session because production is still using non-durable serverless `/tmp` storage instead of Upstash.
 - Implementation changes in progress: add an Upload File control for existing iPhone audio/video recordings and replace the Tina command center with a Faith-specific dashboard intro for nanny users.
+- Direct production media tests with Downloads files found a Vercel request-body ceiling before app code runs: 5.4 MB `.mp4`, 7.4 MB `.mp3`, and 41.3 MB `.mov` returned 413. Smaller `.mp4` files under 2 MB reached OpenAI but returned the existing 401 organization/API-key error.
+- Implemented local changes: Tina command center now has an Upload File control accepting common audio/video/iPhone extensions; client and API now explain the current 4 MB production upload ceiling; Faith dashboard now shows a nanny-specific intro instead of the Tina command center.
+- Verification after edits: `npm run lint` passed and `npm run build` passed.
