@@ -2,84 +2,60 @@
 
 Private, mobile-first family operations app for Sean, Tina, and Faith.
 
-- GitHub repository: https://github.com/Sean-In-The-Library/nanny-app
-- Vercel production: https://nanny-app-8gy6.vercel.app
-- Vercel project: `nanny-app-8gy6`
-- Product ownership: Tina Harrington (primary owner/operator)
-- Sponsors/users: Sean and Tina
+Production target:
 
-The MVP focuses on fast daily coordination: urgent notes, chores, supplies, trackers, medication, calendar, development goals, and care manuals. The dashboard surfaces only what needs attention now.
+- `https://nanny-app-8gy6.vercel.app`
+- Vercel project shown as `nanny-app-8gy6`
+- GitHub repository: `https://github.com/Sean-In-The-Library/nanny-app`
 
-## MVP Goals
+## What It Does
 
-- Keep entry and review fast (usable in under 10 seconds on phone).
-- Use simple password-based login for the three household users.
-- Protect all app routes except `/login`.
-- Keep implementation minimal, mobile-first, and Vercel-safe.
-- Add AI-assisted care note summarization with OpenRouter.
+- Password-gated dashboard for parent/nanny coordination.
+- Tina-first dictation flow: record or type a rough request, transcribe with OpenAI `gpt-4o-transcribe`, convert to reviewable action items, then save selected items.
+- Source-of-truth pages for notes, chores, supplies, trackers, care manuals, development goals, calendar, medication, and milestones.
+- Dashboard surfaces only active or upcoming items.
+- Care manual generator converts rough notes into an approved manual draft through OpenRouter.
 
-## Planned Stack
+## Stack
 
-- Next.js (App Router)
+- Next.js App Router
 - React + TypeScript
 - Tailwind CSS
-- OpenRouter API (for care manual summarization)
-- OpenAI audio transcription API (for dictated notes)
-- Upstash Redis for Vercel persistence
-- GitHub for source control
-- Vercel production deployment
-
-## Core Routes
-
-- `/` dashboard
-- `/login`
-- `/notes`
-- `/chores`
-- `/care-manuals`
-- `/supplies`
-- `/trackers`
-- `/development`
-- `/calendar`
-- `/medication`
-- `/milestones`
+- Vercel
+- OpenRouter for structured care/manual/action drafting
+- OpenAI `gpt-4o-transcribe` for audio transcription
+- Upstash Redis optional for durable shared Vercel persistence
 
 ## Environment Variables
 
-Create a local env file (`.env.local`) from `.env.example` with:
+Create `.env.local` for local development:
 
 ```bash
 OPENROUTER_API_KEY=your_openrouter_key_here
+OPENROUTER_MODEL=openai/gpt-4.1-mini
+
 OPENAI_API_KEY=your_openai_key_here
-APP_SESSION_SECRET=generate_a_long_random_secret
+OPENAI_TRANSCRIBE_MODEL=gpt-4o-transcribe
 
 APP_PASSWORD_SEAN=your_password_here
 APP_PASSWORD_TINA=your_password_here
 APP_PASSWORD_FAITH=your_password_here
+APP_SESSION_SECRET=replace_with_a_long_random_secret
 
-UPSTASH_REDIS_REST_URL=your_upstash_rest_url
-UPSTASH_REDIS_REST_TOKEN=your_upstash_rest_token
 APP_PUBLIC_URL=https://nanny-app-8gy6.vercel.app
+
+UPSTASH_REDIS_REST_URL=
+UPSTASH_REDIS_REST_TOKEN=
 ```
 
-Notes:
+`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are required before real family use on Vercel. Without them, the deployed app can load seeded data, but production saves are rejected instead of pretending temporary serverless storage is durable.
 
-- Do not commit real passwords or API keys.
-- `.env` and `.env.local` are ignored by git.
-- Keep passwords private and share through a secure channel only.
-- In Vercel, add the same values under Project Settings -> Environment Variables.
-- Without Upstash Redis, production can load seed data but will reject saves instead of pretending data is persistent.
+Never commit `.env`, `.env.local`, API keys, or real passwords.
 
-## Local Setup
+## Local Development
 
 ```bash
-git clone https://github.com/Sean-In-The-Library/nanny-app.git
-cd nanny-app
 npm install
-```
-
-Then add your local environment file and run:
-
-```bash
 npm run dev
 ```
 
@@ -87,58 +63,67 @@ Open:
 
 - `http://localhost:3000`
 
-## Login and Auth Test Checklist
-
-1. Visit the app while logged out and confirm redirect to `/login`.
-2. Select one user (`Sean`, `Tina`, or `Faith`) and enter password.
-3. Confirm valid password creates a session and grants access.
-4. Confirm invalid password shows clear error and denies access.
-5. Confirm protected routes cannot be visited while logged out.
-6. Confirm logout clears session and returns to login flow.
-
-## AI Endpoints
-
-Current API routes:
-
-- `POST /api/ai/summarize-care-notes`
-- `POST /api/ai/actionize-dictation`
-- `POST /api/ai/transcribe`
-
-Behavior:
-
-- Uses `OPENROUTER_API_KEY`.
-- Uses `OPENAI_API_KEY` for audio transcription.
-- Returns clean, parent-friendly care manual drafts.
-- Supports approve-before-save flow for manual review.
-
-## Suggested Development Flow
+Useful checks:
 
 ```bash
 npm run lint
 npm run build
 ```
 
-Then commit and push:
+## Login Test
+
+1. Visit `/` while logged out.
+2. Confirm redirect to `/login`.
+3. Select Tina.
+4. Confirm the email is `tinakharrington@gmail.com`.
+5. Try a bad password and confirm it fails.
+6. Try the configured Tina password and confirm the dashboard loads.
+7. Use Logout and confirm protected routes redirect back to `/login`.
+
+Faith has a visually distinct nanny login screen, but the nanny workflow is intentionally light until that side is designed.
+
+## Voice Model Choice
+
+Tina's audio flow uses OpenAI `gpt-4o-transcribe` through `/api/ai/transcribe`. That model is the default because the app needs higher transcription accuracy for child names, chores, medication, and time-sensitive instructions. `gpt-4o-mini-transcribe` can be used later by changing `OPENAI_TRANSCRIBE_MODEL` if cost becomes more important than accuracy.
+
+The route prompts the model with family-specific terms: Tina, Sean, Faith, Kieran, Connor, diapers, wipes, Tylenol, Motrin, potty, nap, and Wonder Wagon.
+
+## Vercel Deployment
+
+Required production env vars:
+
+- `APP_PASSWORD_SEAN`
+- `APP_PASSWORD_TINA`
+- `APP_PASSWORD_FAITH`
+- `APP_SESSION_SECRET`
+- `OPENROUTER_API_KEY`
+- `OPENAI_API_KEY`
+- `APP_PUBLIC_URL=https://nanny-app-8gy6.vercel.app`
+
+Recommended production env vars:
+
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+- `OPENROUTER_MODEL=openai/gpt-4.1-mini`
+- `OPENAI_TRANSCRIBE_MODEL=gpt-4o-transcribe`
+
+Deploy:
 
 ```bash
-git status
-git add .
-git commit -m "Build nanny app MVP foundation"
-git push origin main
+vercel link
+vercel env ls
+vercel deploy --prod
 ```
 
-## Deployment Status
+After deployment, test:
 
-Vercel production is connected to the GitHub `main` branch:
-
-- Production URL: https://nanny-app-8gy6.vercel.app
-- Project slug: `nanny-app-8gy6`
-- Framework: Next.js
-- Runtime: Vercel Node.js 24.x
-
-Deployment checklist:
-
-1. Push working changes to `main`.
-2. Confirm the Vercel deployment finishes successfully.
-3. Add production environment variables before using real family data.
-4. Run full browser and mobile verification.
+- `https://nanny-app-8gy6.vercel.app/login`
+- Tina login
+- dashboard load
+- add/resolve a note
+- create/complete a chore
+- add/resolve a supply
+- add/resolve a tracker
+- medication next-allowed calculation
+- care manual draft generation when `OPENROUTER_API_KEY` is present
+- voice transcription when `OPENAI_API_KEY` is present
