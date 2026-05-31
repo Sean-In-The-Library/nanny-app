@@ -201,6 +201,32 @@ export function createSeedData(): AppData {
         createdBy: "Faith",
       },
     ],
+    adminItems: [
+      {
+        id: "admin-quarterly-tax-check",
+        title: "Quarterly nanny tax check",
+        details:
+          "Confirm payroll records are current and the next household employer tax deadline is on the family calendar.",
+        category: "tax",
+        dueDate: addDays(now, 14).toISOString(),
+        owner: "Sean",
+        status: "open",
+        showOnDashboard: true,
+        createdAt: nowISO(),
+      },
+      {
+        id: "admin-documents-review",
+        title: "Nanny documents review",
+        details:
+          "Confirm agreement, payroll forms, emergency contacts, and shared admin notes are current.",
+        category: "contract",
+        dueDate: addDays(now, 21).toISOString(),
+        owner: "Tina",
+        status: "open",
+        showOnDashboard: true,
+        createdAt: nowISO(),
+      },
+    ],
     updatedAt: nowISO(),
   };
 }

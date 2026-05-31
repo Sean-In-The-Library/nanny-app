@@ -137,6 +137,21 @@ export type Milestone = {
   createdBy: UserName;
 };
 
+export type AdminCategory = "contract" | "payroll" | "tax" | "form" | "other";
+
+export type AdminItem = {
+  id: string;
+  title: string;
+  details: string;
+  category: AdminCategory;
+  dueDate?: string;
+  owner: UserName;
+  status: "open" | "done";
+  showOnDashboard: boolean;
+  createdAt: string;
+  completedAt?: string;
+};
+
 export type ActionDraftKind =
   | "note"
   | "chore"
@@ -173,6 +188,7 @@ export type AppData = {
   calendarEvents: CalendarEvent[];
   medicationEntries: MedicationEntry[];
   milestones: Milestone[];
+  adminItems: AdminItem[];
   updatedAt: string;
 };
 
@@ -181,4 +197,3 @@ export type AuthenticatedUser = {
   email: string;
   role: "parent" | "nanny";
 };
-

@@ -27,7 +27,7 @@ export async function readAppData(): Promise<AppData> {
   if (redisClient) {
     const saved = await redisClient.get<AppData>(DATA_KEY);
     if (saved) {
-      return saved;
+      return normalizeAppData(saved);
     }
 
     const seed = createSeedData();
@@ -37,7 +37,7 @@ export async function readAppData(): Promise<AppData> {
 
   try {
     const file = await fs.readFile(LOCAL_DATA_PATH, "utf8");
-    return JSON.parse(file) as AppData;
+    return normalizeAppData(JSON.parse(file) as Partial<AppData>);
   } catch {
     const seed = createSeedData();
     await writeLocalData(seed);
@@ -47,7 +47,7 @@ export async function readAppData(): Promise<AppData> {
 
 export async function writeAppData(data: AppData): Promise<AppData> {
   const nextData = {
-    ...data,
+    ...normalizeAppData(data),
     updatedAt: new Date().toISOString(),
   };
 
@@ -132,10 +132,36 @@ async function ensurePostgresStorage(sql: SqlClient) {
 
 function parseStoredData(value: unknown): AppData {
   if (typeof value === "string") {
-    return JSON.parse(value) as AppData;
+    return normalizeAppData(JSON.parse(value) as Partial<AppData>);
   }
 
-  return value as AppData;
+  return normalizeAppData(value as Partial<AppData>);
+}
+
+function normalizeAppData(data: Partial<AppData>): AppData {
+  const seed = createSeedData();
+
+  return {
+    notes: Array.isArray(data.notes) ? data.notes : seed.notes,
+    chores: Array.isArray(data.chores) ? data.chores : seed.chores,
+    careManuals: Array.isArray(data.careManuals)
+      ? data.careManuals
+      : seed.careManuals,
+    supplies: Array.isArray(data.supplies) ? data.supplies : seed.supplies,
+    trackers: Array.isArray(data.trackers) ? data.trackers : seed.trackers,
+    developmentGoals: Array.isArray(data.developmentGoals)
+      ? data.developmentGoals
+      : seed.developmentGoals,
+    calendarEvents: Array.isArray(data.calendarEvents)
+      ? data.calendarEvents
+      : seed.calendarEvents,
+    medicationEntries: Array.isArray(data.medicationEntries)
+      ? data.medicationEntries
+      : seed.medicationEntries,
+    milestones: Array.isArray(data.milestones) ? data.milestones : seed.milestones,
+    adminItems: Array.isArray(data.adminItems) ? data.adminItems : seed.adminItems,
+    updatedAt: data.updatedAt ?? seed.updatedAt,
+  };
 }
 
 async function writeLocalData(data: AppData) {

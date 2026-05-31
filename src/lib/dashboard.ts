@@ -8,6 +8,7 @@ import {
   startOfToday,
 } from "./dateUtils";
 import type {
+  AdminItem,
   AppData,
   CalendarEvent,
   Chore,
@@ -27,7 +28,8 @@ export type DashboardItemType =
   | "calendar"
   | "development"
   | "medication"
-  | "milestone";
+  | "milestone"
+  | "admin";
 
 export type DashboardItem = {
   id: string;
@@ -50,6 +52,7 @@ export type DashboardData = {
   unresolvedTrackers: Tracker[];
   upcomingEvents: CalendarEvent[];
   activeDevelopmentGoals: DevelopmentGoal[];
+  openAdminItems: AdminItem[];
   medicationWindows: Array<{
     entry: MedicationEntry;
     nextAllowedAt?: string;
@@ -65,7 +68,11 @@ export type DashboardData = {
   };
 };
 
-export function getDashboardData(data: AppData): DashboardData {
+export function getDashboardData(
+  data: AppData,
+  options: { includeAdmin?: boolean } = {},
+): DashboardData {
+  const includeAdmin = options.includeAdmin ?? true;
   const medicationWindows = data.medicationEntries
       .map((entry) => ({
         entry,
@@ -111,7 +118,12 @@ export function getDashboardData(data: AppData): DashboardData {
   const activeDevelopmentGoals = data.developmentGoals.filter(
       (goal) => goal.active && goal.showOnDashboard,
     );
-  const focus = buildFocusBuckets(data, medicationWindows);
+  const openAdminItems = includeAdmin
+    ? data.adminItems
+        .filter((item) => item.status === "open" && item.showOnDashboard)
+        .sort((a, b) => getTime(a.dueDate) - getTime(b.dueDate))
+    : [];
+  const focus = buildFocusBuckets(data, medicationWindows, includeAdmin);
 
   return {
     medicationWindows,
@@ -121,6 +133,7 @@ export function getDashboardData(data: AppData): DashboardData {
     dueChores,
     lowSupplies,
     activeDevelopmentGoals,
+    openAdminItems,
     focus,
     summary: {
       today: focus.today.length,
@@ -128,7 +141,9 @@ export function getDashboardData(data: AppData): DashboardData {
       month: focus.month.length,
       canWait: focus.canWait.length,
       urgent: focus.today.filter((item) => item.priority === "urgent").length,
-      overdue: data.chores.filter((chore) => isOverdue(chore.nextDueAt)).length,
+      overdue:
+        data.chores.filter((chore) => isOverdue(chore.nextDueAt)).length +
+        openAdminItems.filter((item) => isOverdue(item.dueDate)).length,
     },
   };
 }
@@ -136,6 +151,7 @@ export function getDashboardData(data: AppData): DashboardData {
 function buildFocusBuckets(
   data: AppData,
   medicationWindows: DashboardData["medicationWindows"],
+  includeAdmin: boolean,
 ): Record<DashboardBucket, DashboardItem[]> {
   const items: DashboardItem[] = [];
 
@@ -290,6 +306,32 @@ function buildFocusBuckets(
       });
     });
 
+  if (includeAdmin) {
+    data.adminItems
+      .filter((item) => item.status === "open" && item.showOnDashboard)
+      .forEach((item) => {
+        const bucket = adminBucket(item);
+        items.push({
+          id: `admin-${item.id}`,
+          sourceId: item.id,
+          sourceType: "admin",
+          bucket,
+          title: item.title,
+          details: item.details,
+          meta: item.dueDate
+            ? `${item.category.replaceAll("_", " ")} due ${formatShortDate(item.dueDate)}`
+            : item.category.replaceAll("_", " "),
+          href: "/admin",
+          priority:
+            bucket === "today" || bucket === "laterToday"
+              ? "important"
+              : "normal",
+          dueAt: item.dueDate,
+          actionLabel: "Done",
+        });
+      });
+  }
+
   return {
     today: sortItems(items.filter((item) => item.bucket === "today")),
     laterToday: sortItems(items.filter((item) => item.bucket === "laterToday")),
@@ -320,6 +362,26 @@ function choreBucket(chore: Chore): DashboardBucket {
   }
 
   if (chore.nextDueAt && isWithinNextDays(chore.nextDueAt, 31)) {
+    return "month";
+  }
+
+  return "canWait";
+}
+
+function adminBucket(item: AdminItem): DashboardBucket {
+  if (!item.dueDate) {
+    return "canWait";
+  }
+
+  if (isOnOrBeforeToday(item.dueDate)) {
+    return "today";
+  }
+
+  if (isWithinNextDays(item.dueDate, 7)) {
+    return "laterToday";
+  }
+
+  if (isWithinNextDays(item.dueDate, 31)) {
     return "month";
   }
 

@@ -5,13 +5,14 @@ import {
   Boxes,
   CalendarDays,
   ClipboardList,
+  FileText,
   HeartPulse,
   Home,
   ListChecks,
-  MoreHorizontal,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "@/hooks/useSession";
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
@@ -20,20 +21,28 @@ const navItems = [
   { href: "/supplies", label: "Supplies", icon: Boxes },
   { href: "/trackers", label: "Track", icon: HeartPulse },
   { href: "/care-manuals", label: "Care", icon: Baby },
-  { href: "/calendar", label: "More", icon: CalendarDays },
-  { href: "/milestones", label: "Moments", icon: MoreHorizontal },
+  { href: "/calendar", label: "Dates", icon: CalendarDays },
+  { href: "/admin", label: "Admin", icon: FileText, parentOnly: true },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { user } = useSession();
   if (pathname === "/login") {
     return null;
   }
 
+  const visibleNavItems = navItems.filter(
+    (item) => !item.parentOnly || user?.role === "parent",
+  );
+
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[#ddceb6] bg-[#fffaf0]/95 px-2 py-2 shadow-[0_-8px_24px_rgba(23,32,51,0.08)] backdrop-blur">
-      <div className="mx-auto grid max-w-3xl grid-cols-8 gap-1">
-        {navItems.map((item) => {
+      <div
+        className="mx-auto grid max-w-3xl gap-1"
+        style={{ gridTemplateColumns: `repeat(${visibleNavItems.length}, minmax(0, 1fr))` }}
+      >
+        {visibleNavItems.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href;
           return (
@@ -56,4 +65,3 @@ export function BottomNav() {
     </nav>
   );
 }
-

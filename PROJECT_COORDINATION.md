@@ -2,13 +2,13 @@
 
 ## 1. Purpose
 
-Family Nanny Hub is a private, mobile-first coordination app for Sean, Tina, and Faith. The goal is to make daily nanny handoffs fast enough for tired parents and caregivers: urgent notes, chores, supplies, child trackers, calendar items, medication entries, developmental goals, milestones, and care manuals should be visible without digging through texts.
+Family Nanny Hub is a private, mobile-first coordination app for Sean, Tina, and Faith. The goal is to make daily nanny handoffs fast enough for tired parents and caregivers: urgent notes, chores, supplies, child trackers, calendar items, medication entries, developmental goals, milestones, nanny admin reminders, and care manuals should be visible without digging through texts.
 
 The app is intentionally simple for the MVP:
 
 - Password-gated access for Sean, Tina, and Faith.
 - Dashboard-first workflow showing only what needs attention now.
-- Source pages for notes, chores, supplies, trackers, care manuals, development, calendar, medication, and milestones.
+- Source pages for notes, chores, supplies, trackers, care manuals, development, calendar, medication, milestones, and nanny admin reminders.
 - Tina-focused dictation workflow that turns rough voice notes into structured action items.
 - OpenRouter-assisted care manual drafting.
 - Vercel production deployment from GitHub `main`.
@@ -268,3 +268,15 @@ Active branch consolidation request, 2026-05-31:
 - Vercel CLI production deployment via `npx vercel deploy --prod --scope seans-projects-3ff264cf --yes`: deployment `dpl_Hrtn2faRdxj9gMrz5epq5o2Euk6o` is `READY`.
 - Vercel plugin confirmation: project `nanny-app-8gy6` latest production deployment is `dpl_Hrtn2faRdxj9gMrz5epq5o2Euk6o`.
 - Custom-domain smoke after deploy: `https://nanny-app.aistudioprojects.com/login` returns 200 and unauthenticated `/` redirects to `/login?next=%2F`.
+
+Active Tina email feedback follow-up, 2026-05-31:
+
+- Sean requested a Gmail check for Tina-sent messages that should update this repository, implementation of any resulting fix, push to `main`, Vercel deployment, and another email check in at least one hour.
+- Gmail search scope checked Tina's known sender addresses for recent app/nanny/Faith/dashboard/iPhone/MacBook/dictation terms; no recent Tina-sent app feedback was found.
+- Related older Tina-sent nanny emails were reviewed at a high level; they point to a practical admin need around nanny contracts, payroll setup, forms, and quarterly nanny tax reminders.
+- Product decision: add a neutral Nanny Admin area for contract/payroll/tax/form reminders without importing private email content or private document details into the repo.
+- Follow-up automation: scheduled a one-time heartbeat in this thread for tonight only at 11:00 PM Phoenix time, to re-check Tina email for new actionable nanny-app feedback and, if present, repeat the repo/update/deploy cycle.
+- Implementation update: added `/admin`, parent-facing admin reminder CRUD, `AdminItem` data types, dashboard prioritization for open admin reminders, and storage normalization so older Neon/Redis/local records without `adminItems` still load.
+- Privacy decision: admin reminders are parent-facing in the UI; Faith's dashboard and bottom navigation do not surface the Admin area in this pass.
+- Documentation update: `README.md` and `plan.md` now include nanny admin reminders.
+- Verification after implementation: `npm run lint`, `npm run build`, and `git diff --check` passed locally.

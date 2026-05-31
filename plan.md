@@ -578,6 +578,42 @@ Optional later:
 * Milestone export
 * Monthly milestone summary
 
+### 12. Nanny Admin: `/admin`
+
+Purpose:
+
+Track low-friction household employer and nanny administration reminders without storing private contract or tax documents in the app.
+
+Examples:
+
+* Quarterly nanny tax check
+* Payroll records review
+* Agreement or form renewal
+* Emergency contact review
+
+Fields:
+
+```ts
+id: string
+title: string
+details: string
+category: "contract" | "payroll" | "tax" | "form" | "other"
+dueDate?: string
+owner: "Sean" | "Tina" | "Faith"
+status: "open" | "done"
+showOnDashboard: boolean
+createdAt: string
+completedAt?: string
+```
+
+Dashboard logic:
+
+* Show open admin reminders when `showOnDashboard` is true.
+* Today if due or overdue.
+* Later today if due within 7 days.
+* This month if due within 31 days.
+* Let a parent mark the reminder done from the dashboard.
+
 ## Suggested File Structure
 
 ```text
@@ -602,6 +638,8 @@ Optional later:
     /medication
       page.tsx
     /milestones
+      page.tsx
+    /admin
       page.tsx
     /api
       /login

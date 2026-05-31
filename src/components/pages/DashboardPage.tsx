@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   ClipboardCheck,
   Clock3,
+  FileText,
   HeartHandshake,
   HeartPulse,
   ListFilter,
@@ -133,7 +134,22 @@ export function DashboardPage() {
     }
     if (item.sourceType === "tracker") {
       await resolveTracker(item.sourceId);
+      return;
     }
+    if (item.sourceType === "admin") {
+      await completeAdminItem(item.sourceId);
+    }
+  }
+
+  async function completeAdminItem(id: string) {
+    await updateData((current) => ({
+      ...current,
+      adminItems: current.adminItems.map((item) =>
+        item.id === id
+          ? { ...item, status: "done", completedAt: nowISO() }
+          : item,
+      ),
+    }));
   }
 
   return (
@@ -153,7 +169,7 @@ export function DashboardPage() {
         </div>
       ) : (
         <DashboardContent
-          dashboard={getDashboardData(data)}
+          dashboard={getDashboardData(data, { includeAdmin: user?.role === "parent" })}
           data={data}
           error={error}
           saving={saving}
@@ -294,7 +310,7 @@ function PriorityOverview({
           {counts.urgent} urgent today
         </p>
         <p className="rounded-xl bg-[#fff0ee] px-3 py-2">
-          {counts.overdue} overdue chores
+          {counts.overdue} overdue items
         </p>
       </div>
     </section>
@@ -526,6 +542,8 @@ function SourceIcon({
       return <Pill size={size} aria-hidden />;
     case "milestone":
       return <Sparkles size={size} aria-hidden />;
+    case "admin":
+      return <FileText size={size} aria-hidden />;
     default:
       return <StickyNote size={size} aria-hidden />;
   }
