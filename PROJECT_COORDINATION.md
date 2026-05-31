@@ -263,3 +263,8 @@ Active branch consolidation request, 2026-05-31:
 - GitHub plugin branch search also returned only `main`.
 - `git pull --ff-only origin main` returned `Already up to date.`
 - Merge result: no non-main branches exist to merge; the deploy will use current `main` plus this coordination audit commit.
+- Verification before push: `npm run lint` passed and `npm run build` passed locally.
+- GitHub push: commit `be4da3f` (`Record branch consolidation audit`) was pushed to `origin/main`.
+- Vercel CLI production deployment via `npx vercel deploy --prod --scope seans-projects-3ff264cf --yes`: deployment `dpl_Hrtn2faRdxj9gMrz5epq5o2Euk6o` is `READY`.
+- Vercel plugin confirmation: project `nanny-app-8gy6` latest production deployment is `dpl_Hrtn2faRdxj9gMrz5epq5o2Euk6o`.
+- Custom-domain smoke after deploy: `https://nanny-app.aistudioprojects.com/login` returns 200 and unauthenticated `/` redirects to `/login?next=%2F`.
