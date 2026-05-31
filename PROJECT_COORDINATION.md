@@ -247,3 +247,9 @@ Active device-optimization feedback, 2026-05-31:
 - Existing source pages remain unchanged.
 - Verification after the dashboard update: `npm run lint` passed and `npm run build` passed locally.
 - React best-practices review: hooks are top-level, icon renderers are stable components, list keys use durable item ids, and action buttons remain native buttons/links.
+- GitHub push: commit `819af5c` (`Consolidate dashboard priorities`) was pushed to `origin/main`.
+- Vercel CLI production deployment via `npx vercel deploy --prod --scope seans-projects-3ff264cf --yes`: deployment `dpl_BfYV8J9u7A28N5LuxzyxNNQNK6ZF` is `READY` and aliased to `https://nanny-app.aistudioprojects.com`.
+- Vercel plugin confirmation: project `nanny-app-8gy6` latest production deployment is `dpl_BfYV8J9u7A28N5LuxzyxNNQNK6ZF`.
+- Production custom-domain smoke after the dashboard pass passed: `/login` returns 200, unauthenticated `/` redirects to `/login?next=%2F`, Tina login returns role `parent`, Faith login returns role `nanny`, `/api/data` read works, temporary note write/read/restore worked, and dictation actionization returned draft items.
+- Production logs check after smoke: Vercel logs showed 200 responses for `/api/login`, `/api/session`, `/api/data`, `/api/ai/actionize-dictation`, plus expected 307 for `/`.
+- Browser plugin limitation: Playwright browser verification still cannot launch Chrome in this desktop session; Chrome exits with code 13 before page load. HTTP/API and build verification are complete.
