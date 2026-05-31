@@ -147,7 +147,7 @@ Current state:
 - The requested production domain is `https://nanny-app.aistudioprojects.com`.
 - Vercel plugin confirmed the target project is `nanny-app-8gy6`, project id `prj_rpmOpZw5DpEB4nb7jDHD4zLTLk49`, under team `seans-projects-3ff264cf`.
 - Vercel CLI added `nanny-app.aistudioprojects.com` to the linked `nanny-app-8gy6` project; Vercel reports it will point to the latest production deployment.
-- The local folder is on GitHub `origin/main` at commit `ac004f4`.
+- The production app implementation was pushed to GitHub `origin/main` at commit `ac004f4`; later coordination-only commits may follow it.
 
 Immediate plan:
 
