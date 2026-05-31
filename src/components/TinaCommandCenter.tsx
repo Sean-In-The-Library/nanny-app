@@ -1,7 +1,7 @@
 "use client";
 
-import { Check, Loader2, Mic, Square, WandSparkles } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Check, Loader2, Mic, Square, Upload, WandSparkles } from "lucide-react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { ActionButton } from "./ActionButton";
 import { applyActionDrafts } from "@/lib/actionDrafts";
 import type { ActionDraft, AppData, UserName } from "@/lib/types";
@@ -25,6 +25,7 @@ export function TinaCommandCenter({
 }) {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [recording, setRecording] = useState(false);
   const [busy, setBusy] = useState(false);
   const [transcript, setTranscript] = useState("");
@@ -59,7 +60,12 @@ export function TinaCommandCenter({
     });
 
     recorder.addEventListener("stop", () => {
-      void transcribeRecording(new Blob(chunksRef.current, { type: recorder.mimeType }));
+      const recordingFile = new File(
+        chunksRef.current,
+        "tina-dictation.webm",
+        { type: recorder.mimeType || "audio/webm" },
+      );
+      void transcribeFile(recordingFile);
       stream.getTracks().forEach((track) => track.stop());
     });
 
@@ -73,15 +79,12 @@ export function TinaCommandCenter({
     setRecording(false);
   }
 
-  async function transcribeRecording(blob: Blob) {
+  async function transcribeFile(file: File) {
     setBusy(true);
     setError(null);
     try {
       const formData = new FormData();
-      formData.set(
-        "audio",
-        new File([blob], "tina-dictation.webm", { type: blob.type || "audio/webm" }),
-      );
+      formData.set("audio", file);
       const response = await fetch("/api/ai/transcribe", {
         method: "POST",
         body: formData,
@@ -101,6 +104,21 @@ export function TinaCommandCenter({
     } finally {
       setBusy(false);
     }
+  }
+
+  function chooseRecordingFile() {
+    fileInputRef.current?.click();
+  }
+
+  function handleRecordingFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    void transcribeFile(file);
   }
 
   async function makeActionItems() {
@@ -214,8 +232,20 @@ export function TinaCommandCenter({
             {busy ? <Loader2 className="animate-spin" size={16} aria-hidden /> : <WandSparkles size={16} aria-hidden />}
             Make Items
           </ActionButton>
+          <ActionButton tone="quiet" onClick={chooseRecordingFile} disabled={busy}>
+            {busy ? <Loader2 className="animate-spin" size={16} aria-hidden /> : <Upload size={16} aria-hidden />}
+            Upload File
+          </ActionButton>
         </div>
       </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="audio/*,video/mp4,video/quicktime,video/x-m4v,.m4a,.mp4,.mov,.m4v,.aac,.wav,.mp3,.webm,.caf,.aiff"
+        onChange={handleRecordingFile}
+        className="sr-only"
+      />
 
       <textarea
         value={transcript}

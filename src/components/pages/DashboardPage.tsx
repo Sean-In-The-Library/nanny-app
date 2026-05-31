@@ -4,6 +4,7 @@ import {
   CalendarClock,
   CheckCircle2,
   ClipboardCheck,
+  HeartHandshake,
   HeartPulse,
   PackageOpen,
   Pill,
@@ -19,6 +20,7 @@ import { PageHeader } from "../PageHeader";
 import { PriorityPill } from "../PriorityPill";
 import { TinaCommandCenter } from "../TinaCommandCenter";
 import { useAppData } from "@/hooks/useAppData";
+import { useSession } from "@/hooks/useSession";
 import {
   calculateNextDueDate,
   formatDateTime,
@@ -29,6 +31,7 @@ import { getDashboardData } from "@/lib/dashboard";
 
 export function DashboardPage() {
   const { data, loading, saving, error, saveData, updateData } = useAppData();
+  const { user } = useSession();
 
   async function resolveNote(id: string) {
     await updateData((current) => ({
@@ -101,7 +104,11 @@ export function DashboardPage() {
             </p>
           ) : null}
 
-          <TinaCommandCenter data={data} saving={saving} onSave={saveData} />
+          {user?.role === "parent" ? (
+            <TinaCommandCenter data={data} saving={saving} onSave={saveData} />
+          ) : (
+            <NannyDashboardIntro />
+          )}
 
           <DashboardSections
             dashboard={getDashboardData(data)}
@@ -113,6 +120,30 @@ export function DashboardPage() {
         </div>
       )}
     </AppShell>
+  );
+}
+
+function NannyDashboardIntro() {
+  return (
+    <section className="rounded-3xl border border-[#b8ddb9] bg-[#edf8ed] p-4 shadow-sm sm:p-5">
+      <div className="flex gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-[#245b2d] shadow-sm">
+          <HeartHandshake size={20} aria-hidden />
+        </div>
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[#3a6b42]">
+            Faith view
+          </p>
+          <h2 className="text-xl font-black text-[#172033]">
+            Today&apos;s care notes
+          </h2>
+          <p className="mt-1 text-sm font-semibold leading-6 text-[#3a6b42]">
+            Start with anything marked urgent, then work through chores, supplies,
+            and child status notes as the day allows.
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }
 

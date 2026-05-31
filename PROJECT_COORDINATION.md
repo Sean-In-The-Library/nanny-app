@@ -194,5 +194,13 @@ Active browser QA update, 2026-05-30 20:26 America/Phoenix:
 
 - Sean requested Browser/browser-use verification with Tina credentials, an audio or video file from Downloads, and the Faith nanny profile.
 - Candidate local media files were found in `C:\Users\seane\Downloads`, including recent `.mp4` files and older `.mov`/`.mp3` files.
-- Code inspection before browser testing shows the current UI records microphone audio but does not expose a file-upload control for existing audio or video files; `/api/ai/transcribe` accepts one multipart field named `audio`.
-- Next steps: drive production in the in-app Browser, test Tina login and dictation-to-task behavior, directly test `/api/ai/transcribe` with local media files where the UI has no upload control, then log in as Faith and review wording/visibility from the nanny perspective.
+- Code inspection before browser testing showed the UI recorded microphone audio but did not expose a file-upload control for existing audio or video files; `/api/ai/transcribe` accepts one multipart field named `audio`.
+- Implementation update: `src/components/TinaCommandCenter.tsx` now includes an `Upload File` button and hidden file input accepting common audio/video formats, reusing the same transcription path as microphone recordings.
+- Implementation update: `src/app/api/ai/transcribe/route.ts` now describes uploads as audio or video recordings, matching the new UI.
+- Implementation update: `src/components/pages/DashboardPage.tsx` now shows Tina/Sean the parent command center and shows Faith a separate nanny-oriented dashboard intro.
+- Verification: `npm run lint` passed and `npm run build` passed after the upload-control change.
+- Remaining blocker: actual transcription with uploaded files is still blocked by the OpenAI organization/API-key 401 until `OPENAI_API_KEY` is fixed.
+- Browser Tina login succeeded and the command center generated warm, non-blaming draft items from a synthetic parent note.
+- Browser Faith login succeeded, but the nanny profile could see the Tina command center, which is not appropriate for a nanny-facing experience.
+- Cross-profile handoff of a saved test item did not reliably appear in a fresh Faith session because production is still using non-durable serverless `/tmp` storage instead of Upstash.
+- Implementation changes in progress: add an Upload File control for existing iPhone audio/video recordings and replace the Tina command center with a Faith-specific dashboard intro for nanny users.

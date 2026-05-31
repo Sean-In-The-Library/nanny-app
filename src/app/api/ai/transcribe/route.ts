@@ -14,14 +14,14 @@ export async function POST(request: Request) {
 
   if (!(audio instanceof File)) {
     return NextResponse.json(
-      { error: "Upload an audio recording to transcribe." },
+      { error: "Upload an audio or video recording to transcribe." },
       { status: 400 },
     );
   }
 
   if (audio.size > 25 * 1024 * 1024) {
     return NextResponse.json(
-      { error: "Audio files must be 25 MB or smaller." },
+      { error: "Audio or video files must be 25 MB or smaller." },
       { status: 400 },
     );
   }
@@ -61,4 +61,3 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ text: payload?.text ?? "" });
 }
-
