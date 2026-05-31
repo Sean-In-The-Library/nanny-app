@@ -12,6 +12,30 @@ type ActionizeResponse = {
   questions: string[];
 };
 
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
+type SpeechRecognitionInstance = {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+  onend: (() => void) | null;
+  onerror: ((event: { error?: string }) => void) | null;
+  onresult: ((event: SpeechRecognitionResultEvent) => void) | null;
+};
+type SpeechRecognitionResultEvent = {
+  resultIndex: number;
+  results: SpeechRecognitionResultListLike;
+};
+type SpeechRecognitionResultListLike = {
+  length: number;
+  [index: number]: {
+    isFinal: boolean;
+    [index: number]: { transcript: string } | undefined;
+  };
+};
+
 const MAX_TRANSCRIBE_UPLOAD_BYTES = 4 * 1024 * 1024;
 
 export function TinaCommandCenter({
@@ -26,9 +50,12 @@ export function TinaCommandCenter({
   createdBy?: UserName;
 }) {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const speechRecognitionRef = useRef<SpeechRecognitionInstance | null>(null);
+  const liveDictationBaseRef = useRef("");
   const chunksRef = useRef<Blob[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [recording, setRecording] = useState(false);
+  const [liveDictating, setLiveDictating] = useState(false);
   const [busy, setBusy] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [drafts, setDrafts] = useState<ActionDraft[]>([]);
@@ -40,8 +67,71 @@ export function TinaCommandCenter({
   useEffect(() => {
     return () => {
       mediaRecorderRef.current?.stream.getTracks().forEach((track) => track.stop());
+      speechRecognitionRef.current?.abort();
     };
   }, []);
+
+  function getSpeechRecognitionConstructor() {
+    const speechWindow = window as typeof window & {
+      SpeechRecognition?: SpeechRecognitionConstructor;
+      webkitSpeechRecognition?: SpeechRecognitionConstructor;
+    };
+
+    return speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
+  }
+
+  function startLiveDictation() {
+    setError(null);
+    setMessage(null);
+    const Recognition = getSpeechRecognitionConstructor();
+
+    if (!Recognition) {
+      setError("Live dictation is not available in this browser.");
+      return;
+    }
+
+    const recognition = new Recognition();
+    let finalTranscript = "";
+    liveDictationBaseRef.current = transcript.trim();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+    recognition.onresult = (event) => {
+      let interimTranscript = "";
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        const result = event.results[index];
+        const spokenText = result[0]?.transcript ?? "";
+        if (result.isFinal) {
+          finalTranscript += `${spokenText} `;
+        } else {
+          interimTranscript += spokenText;
+        }
+      }
+
+      const dictatedText = `${finalTranscript}${interimTranscript}`.trim();
+      setTranscript(
+        [liveDictationBaseRef.current, dictatedText].filter(Boolean).join(" "),
+      );
+    };
+    recognition.onerror = (event) => {
+      setLiveDictating(false);
+      setError(event.error ? `Live dictation stopped: ${event.error}.` : "Live dictation stopped.");
+    };
+    recognition.onend = () => {
+      setLiveDictating(false);
+      speechRecognitionRef.current = null;
+    };
+
+    speechRecognitionRef.current = recognition;
+    recognition.start();
+    setLiveDictating(true);
+  }
+
+  function stopLiveDictation() {
+    speechRecognitionRef.current?.stop();
+    setLiveDictating(false);
+    setMessage("Dictation added to the note.");
+  }
 
   async function startRecording() {
     setError(null);
@@ -222,13 +312,24 @@ export function TinaCommandCenter({
           </h2>
         </div>
         <div className="flex flex-wrap gap-2">
+          {liveDictating ? (
+            <ActionButton tone="danger" onClick={stopLiveDictation}>
+              <Square size={16} aria-hidden />
+              Stop Dictating
+            </ActionButton>
+          ) : (
+            <ActionButton onClick={startLiveDictation} disabled={busy || recording}>
+              <Mic size={16} aria-hidden />
+              Dictate
+            </ActionButton>
+          )}
           {recording ? (
             <ActionButton tone="danger" onClick={stopRecording}>
               <Square size={16} aria-hidden />
               Stop
             </ActionButton>
           ) : (
-            <ActionButton onClick={startRecording} disabled={busy}>
+            <ActionButton tone="secondary" onClick={startRecording} disabled={busy || liveDictating}>
               <Mic size={16} aria-hidden />
               Record
             </ActionButton>

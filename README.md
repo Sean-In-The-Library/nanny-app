@@ -11,7 +11,7 @@ Production target:
 ## What It Does
 
 - Password-gated dashboard for parent/nanny coordination.
-- Tina-first dictation flow: record or type a rough request, transcribe with OpenAI `gpt-4o-transcribe`, convert to reviewable action items, then save selected items.
+- Tina-first dictation flow: dictate live in supported browsers, record/upload for OpenAI `gpt-4o-transcribe`, type as a fallback, convert to reviewable action items, then save selected items.
 - Source-of-truth pages for notes, chores, supplies, trackers, care manuals, development goals, calendar, medication, and milestones.
 - Dashboard surfaces only active or upcoming items.
 - Care manual generator converts rough notes into an approved manual draft through OpenRouter.
@@ -88,6 +88,8 @@ Faith has a visually distinct nanny login screen, but the nanny workflow is inte
 Tina's audio flow uses OpenAI `gpt-4o-transcribe` through `/api/ai/transcribe`. That model is the default because the app needs higher transcription accuracy for child names, chores, medication, and time-sensitive instructions. `gpt-4o-mini-transcribe` can be used later by changing `OPENAI_TRANSCRIBE_MODEL` if cost becomes more important than accuracy.
 
 The route prompts the model with family-specific terms: Tina, Sean, Faith, Kieran, Connor, diapers, wipes, Tylenol, Motrin, potty, nap, and Wonder Wagon.
+
+The command center also includes a browser-native live `Dictate` button. That gives Tina an immediate dictate-to-action path when the OpenAI transcription key is unavailable, while keeping the OpenAI route as the higher-accuracy upload/recording path.
 
 ## Vercel Deployment
 

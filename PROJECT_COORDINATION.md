@@ -43,6 +43,7 @@ Current stack:
 - Local development falls back to `.data/nanny-hub.json`.
 - OpenRouter powers care manual and dictation action-item generation.
 - OpenAI `gpt-4o-transcribe` supports browser audio dictation for Tina's voice workflow.
+- Browser-native live speech recognition is also available for Tina as a no-key fallback when the browser supports it.
 
 Required production environment variables:
 
@@ -225,4 +226,11 @@ Active persistence update, 2026-05-30 20:43 America/Phoenix:
 - Vercel CLI production deployment: `dpl_5K7ehdASktmV7wtRK7zBP9h5ziVY` is `READY`; Vercel plugin confirms `nanny-app.aistudioprojects.com` remains attached to the `nanny-app-8gy6` project.
 - Production custom-domain smoke after Neon deployment passed: `/login` returns 200, unauthenticated `/` redirects to `/login?next=%2F`, Tina login returns the configured profile, `/api/data` read works, a temporary note write/read/restore worked, dictation actionization returned draft items, and care manual summarization returned a summary with follow-up questions.
 - Production Faith smoke after Neon deployment: Faith login returns role `nanny`; the parent command center is not present in the server-rendered dashboard HTML.
-- Remaining blocker: production transcription still returns OpenAI 401, "You do not have access to the organization tied to the API key." The app code and upload UI are wired correctly, but the production OpenAI key or organization access must be fixed before Tina can use live audio transcription.
+- Remaining blocker: production recording/upload transcription still returns OpenAI 401, "You do not have access to the organization tied to the API key." The OpenAI app code and upload UI are wired correctly, but the production OpenAI key or organization access must be fixed before Tina can use the higher-accuracy model transcription path.
+
+Active voice fallback update, 2026-05-30 20:51 America/Phoenix:
+
+- Implementation update: `src/components/TinaCommandCenter.tsx` now includes a browser-native live `Dictate` button using `SpeechRecognition`/`webkitSpeechRecognition` when available.
+- This gives Tina an immediately usable dictate-to-action path in supported browsers even while the OpenAI transcription key is blocked.
+- The existing `Record` and `Upload File` controls remain wired to `/api/ai/transcribe` and OpenAI `gpt-4o-transcribe` for the higher-accuracy model path once the API key/org access is fixed.
+- Verification after the fallback update: `npm run lint` passed and `npm run build` passed locally.
