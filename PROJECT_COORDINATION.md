@@ -207,3 +207,7 @@ Active browser QA update, 2026-05-30 20:26 America/Phoenix:
 - Direct production media tests with Downloads files found a Vercel request-body ceiling before app code runs: 5.4 MB `.mp4`, 7.4 MB `.mp3`, and 41.3 MB `.mov` returned 413. Smaller `.mp4` files under 2 MB reached OpenAI but returned the existing 401 organization/API-key error.
 - Implemented local changes: Tina command center now has an Upload File control accepting common audio/video/iPhone extensions; client and API now explain the current 4 MB production upload ceiling; Faith dashboard now shows a nanny-specific intro instead of the Tina command center.
 - Verification after edits: `npm run lint` passed and `npm run build` passed.
+- Pushed production commit `bc383aa` (`Add transcription upload size guard`); Vercel deployment `https://nanny-app-8gy6-5hsuw76go-seans-projects-3ff264cf.vercel.app` returned Ready.
+- Post-deploy browser verification: Tina login shows Upload File in the command center; Faith login shows the nanny-specific "Today's care notes" panel and no Tina command center.
+- Post-deploy media verification: 4.27 MB `.mp4` returns the app's clear 400 size message; 3.43 MB and 3.93 MB `.mp4` files reach OpenAI but still return the production OpenAI 401 organization/API-key error.
+- Temporary production data snapshot was restored after the browser save test.
