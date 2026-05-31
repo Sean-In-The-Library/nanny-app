@@ -13,7 +13,7 @@ Production target:
 - Password-gated dashboard for parent/nanny coordination.
 - Tina-first dictation flow: dictate live in supported browsers, record/upload for OpenAI `gpt-4o-transcribe`, type as a fallback, convert to reviewable action items, then save selected items.
 - Source-of-truth pages for notes, chores, supplies, trackers, care manuals, development goals, calendar, medication, and milestones.
-- Dashboard surfaces only active or upcoming items.
+- Dashboard surfaces active items through day/month priority buckets: today, later today, this month, and can wait.
 - Care manual generator converts rough notes into an approved manual draft through OpenRouter.
 
 ## Stack

@@ -234,3 +234,16 @@ Active voice fallback update, 2026-05-30 20:51 America/Phoenix:
 - This gives Tina an immediately usable dictate-to-action path in supported browsers even while the OpenAI transcription key is blocked.
 - The existing `Record` and `Upload File` controls remain wired to `/api/ai/transcribe` and OpenAI `gpt-4o-transcribe` for the higher-accuracy model path once the API key/org access is fixed.
 - Verification after the fallback update: `npm run lint` passed and `npm run build` passed locally.
+
+Active device-optimization feedback, 2026-05-31:
+
+- New feedback: the visual design is strong, but the dashboard needs a MacBook Air and iPhone optimization pass.
+- Product decision: consolidate the homepage around four priority bands instead of showing every source feed equally: today, later today, this month, and can wait.
+- Product decision: MacBook Air should use width for context and reduce clicking; iPhone should lead with urgent/current items and make secondary context easy to scan.
+- Product decision: feed filtering should distinguish day-level importance from month-level importance.
+- Implementation update: `src/lib/dashboard.ts` now produces consolidated dashboard buckets: `today`, `laterToday`, `month`, and `canWait`, plus summary counts for urgent and overdue items.
+- Implementation update: `src/components/pages/DashboardPage.tsx` now uses a consolidated focus feed with bucket filtering, top summary metrics, and a MacBook-width context rail for month/later/can-wait items.
+- Implementation update: the iPhone layout keeps a single priority feed first, with the same filters exposed as large tap targets.
+- Existing source pages remain unchanged.
+- Verification after the dashboard update: `npm run lint` passed and `npm run build` passed locally.
+- React best-practices review: hooks are top-level, icon renderers are stable components, list keys use durable item ids, and action buttons remain native buttons/links.
