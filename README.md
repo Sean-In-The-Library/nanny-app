@@ -24,7 +24,7 @@ Production target:
 - Vercel
 - OpenRouter for structured care/manual/action drafting
 - OpenAI `gpt-4o-transcribe` for audio transcription
-- Upstash Redis optional for durable shared Vercel persistence
+- Neon Postgres or Upstash Redis for durable shared Vercel persistence
 
 ## Environment Variables
 
@@ -44,11 +44,12 @@ APP_SESSION_SECRET=replace_with_a_long_random_secret
 
 APP_PUBLIC_URL=https://nanny-app.aistudioprojects.com
 
+DATABASE_URL=
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 ```
 
-`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are recommended before real family use on Vercel. Without them, the deployed app can save during a warm serverless session, but data may reset when Vercel rotates the function instance.
+`DATABASE_URL` is the preferred production persistence path. `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are still supported as a fallback. Without either database option, the deployed app can save during a warm serverless session, but data may reset when Vercel rotates the function instance.
 
 Never commit `.env`, `.env.local`, API keys, or real passwords.
 
@@ -99,8 +100,9 @@ Required production env vars:
 - `OPENROUTER_API_KEY`
 - `OPENAI_API_KEY`
 - `APP_PUBLIC_URL=https://nanny-app.aistudioprojects.com`
+- `DATABASE_URL`
 
-Recommended production env vars:
+Optional production env vars:
 
 - `UPSTASH_REDIS_REST_URL`
 - `UPSTASH_REDIS_REST_TOKEN`

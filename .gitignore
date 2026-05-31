@@ -8,3 +8,4 @@ scaffold-app/
 npm-debug.log*
 
 .vercel
+.env*.local

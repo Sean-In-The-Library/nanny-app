@@ -39,7 +39,7 @@ Current stack:
 - Tailwind CSS for the mobile-first UI.
 - Simple environment-variable password gate.
 - `src/proxy.ts` protects app routes and redirects unauthenticated users to `/login`.
-- Upstash Redis is the intended production persistence layer.
+- Neon Postgres is the preferred production persistence layer, with Upstash Redis still supported as a fallback.
 - Local development falls back to `.data/nanny-hub.json`.
 - OpenRouter powers care manual and dictation action-item generation.
 - OpenAI `gpt-4o-transcribe` supports browser audio dictation for Tina's voice workflow.
@@ -55,6 +55,7 @@ OPENROUTER_API_KEY=
 OPENROUTER_MODEL=
 OPENAI_API_KEY=
 OPENAI_TRANSCRIBE_MODEL=
+DATABASE_URL=
 UPSTASH_REDIS_REST_URL=
 UPSTASH_REDIS_REST_TOKEN=
 APP_PUBLIC_URL=https://nanny-app.aistudioprojects.com
@@ -63,8 +64,8 @@ APP_PUBLIC_URL=https://nanny-app.aistudioprojects.com
 Production env status as of 2026-05-31:
 
 - Added through Vercel CLI for production: `APP_PASSWORD_SEAN`, `APP_PASSWORD_TINA`, `APP_PASSWORD_FAITH`, `APP_SESSION_SECRET`, `OPENROUTER_API_KEY`, `OPENROUTER_MODEL`, `OPENAI_API_KEY`, `OPENAI_TRANSCRIBE_MODEL`, and `APP_PUBLIC_URL`.
-- Not yet configured: `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
-- Until Upstash is configured, production can run and save during a warm serverless session, but data should be treated as temporary.
+- `DATABASE_URL` and Neon Postgres connection env vars were added through the Vercel Marketplace Neon integration for production and preview.
+- Not yet configured: `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`; these are optional if Neon is connected.
 
 Tina review email should include masked login details only:
 
@@ -211,3 +212,11 @@ Active browser QA update, 2026-05-30 20:26 America/Phoenix:
 - Post-deploy browser verification: Tina login shows Upload File in the command center; Faith login shows the nanny-specific "Today's care notes" panel and no Tina command center.
 - Post-deploy media verification: 4.27 MB `.mp4` returns the app's clear 400 size message; 3.43 MB and 3.93 MB `.mp4` files reach OpenAI but still return the production OpenAI 401 organization/API-key error.
 - Temporary production data snapshot was restored after the browser save test.
+
+Active persistence update, 2026-05-30 20:43 America/Phoenix:
+
+- Upstash Redis Marketplace provisioning was inspected through Vercel CLI; the available Redis plan is pay-as-you-go rather than free.
+- Neon Marketplace provisioning was completed through Vercel CLI on the `free_v3` plan with region `pdx1`, resource name `nanny-app-data`.
+- Implementation update: `src/lib/storage.ts` now uses Neon/Postgres when `DATABASE_URL` or `POSTGRES_URL` is present, falls back to Upstash Redis when configured, and otherwise uses the local file fallback.
+- Documentation update: `.env.example` and `README.md` now list `DATABASE_URL` as the preferred production persistence setting.
+- Vercel env check now shows `DATABASE_URL`, `POSTGRES_URL`, and related Neon variables attached to production and preview.
