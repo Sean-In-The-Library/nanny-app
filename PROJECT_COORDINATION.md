@@ -147,7 +147,7 @@ Current state:
 - The requested production domain is `https://nanny-app.aistudioprojects.com`.
 - Vercel plugin confirmed the target project is `nanny-app-8gy6`, project id `prj_rpmOpZw5DpEB4nb7jDHD4zLTLk49`, under team `seans-projects-3ff264cf`.
 - Vercel CLI added `nanny-app.aistudioprojects.com` to the linked `nanny-app-8gy6` project; Vercel reports it will point to the latest production deployment.
-- The local folder has been reattached to GitHub `origin/main` at commit `3f6d887`.
+- The local folder is on GitHub `origin/main` at commit `ac004f4`.
 
 Immediate plan:
 
@@ -167,8 +167,10 @@ Status:
 - Local AI verification: dictation actionization returned three draft items after capping OpenRouter output tokens; care manual summarization returned a draft and questions.
 - Local voice transcription verification: generated WAV upload reached `/api/ai/transcribe`, but OpenAI returned 401, "You do not have access to the organization tied to the API key." The app code is wired to `gpt-4o-transcribe`, but the current `OPENAI_API_KEY` is not usable for transcription.
 - Browser verification: Playwright MCP failed to launch Chrome twice with exit code 13, so visual QA is not complete yet. HTTP/API verification is complete so far.
-- GitHub deployment trigger: pending current commit and push.
-- Vercel verification: pending.
+- GitHub deployment trigger: pushed commit `ac004f4` to `origin/main`.
+- Vercel verification: latest inspected production deployment `dpl_GqBx4DfDvLRDAdGXr2EpCgsWUbQK` is `READY` at `https://nanny-app-8gy6-4gaasmgjz-seans-projects-3ff264cf.vercel.app` and aliased to `https://nanny-app.aistudioprojects.com`.
+- Production custom-domain smoke verification: passed for login page, unauthenticated redirect, Tina login, session read, dashboard HTML load, protected data read, temporary note write, temporary note restore, dictation actionization, and care manual summarization.
+- Production env correction: first production login failed after deployment because the PowerShell env-pipe likely included a UTF-8 BOM in encrypted values. Env vars were removed and re-added using a no-BOM temp file.
 - Tina email: pending explicit approval.
 - Morning feedback automation: pending explicit request.
 
@@ -180,4 +182,7 @@ Active handoff update, 2026-05-30 20:16 America/Phoenix:
 - `Get-Command vercel` found `C:\Users\seane\AppData\Roaming\npm\vercel.ps1`; `vercel --version` returned `51.7.0`, so the local CLI is currently usable in this shell.
 - Local runtime check: Node `v22.12.0`, npm `10.9.0`.
 - Verification rerun in this active pass: `npm run lint` passed; `npm run build` passed with Next.js `16.2.6` and 21 static pages generated.
-- Remaining gates before sharing with Tina: commit/push, production deploy and verification, and explicit Sean approval for email.
+- Vercel custom domain verification: `https://nanny-app.aistudioprojects.com/login` returns 200, and `/` redirects to `/login?next=%2F`.
+- Vercel environment check: required production env vars except Upstash are present.
+- Production login/API retest after deployment passed on `https://nanny-app.aistudioprojects.com`.
+- Remaining gates before sharing with Tina: explicit Sean approval for email and any requested morning feedback automation.
