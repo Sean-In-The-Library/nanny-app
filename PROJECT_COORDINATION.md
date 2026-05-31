@@ -168,7 +168,7 @@ Status:
 - Local voice transcription verification: generated WAV upload reached `/api/ai/transcribe`, but OpenAI returned 401, "You do not have access to the organization tied to the API key." The app code is wired to `gpt-4o-transcribe`, but the current `OPENAI_API_KEY` is not usable for transcription.
 - Browser verification: Playwright MCP failed to launch Chrome twice with exit code 13, so visual QA is not complete yet. HTTP/API verification is complete so far.
 - GitHub deployment trigger: pushed commit `ac004f4` to `origin/main`.
-- Vercel verification: latest inspected production deployment `dpl_ChctFGRML6WD7j5JPizYdFQNeKgw` is `READY` at `https://nanny-app-8gy6-779088hyc-seans-projects-3ff264cf.vercel.app` and aliased to `https://nanny-app.aistudioprojects.com`.
+- Vercel verification: app-code production deployment `dpl_ChctFGRML6WD7j5JPizYdFQNeKgw` was `READY` at `https://nanny-app-8gy6-779088hyc-seans-projects-3ff264cf.vercel.app` and aliased to `https://nanny-app.aistudioprojects.com`; later coordination-only commits may create newer deployments without changing app behavior.
 - Production custom-domain smoke verification: passed for login page, unauthenticated redirect, Tina login, session read, dashboard HTML load, protected data read, temporary note write, temporary note restore, dictation actionization, and care manual summarization.
 - Production voice transcription verification: synthetic WAV upload reached `/api/ai/transcribe`, but OpenAI returned 401, "You do not have access to the organization tied to the API key." Voice dictation should be treated as blocked until the production `OPENAI_API_KEY` is replaced or the OpenAI organization access is fixed.
 - Production env correction: first production login failed after deployment because the PowerShell env-pipe likely included a UTF-8 BOM in encrypted values. Env vars were removed and re-added using a no-BOM temp file.
@@ -186,4 +186,5 @@ Active handoff update, 2026-05-30 20:16 America/Phoenix:
 - Vercel custom domain verification: `https://nanny-app.aistudioprojects.com/login` returns 200, and `/` redirects to `/login?next=%2F`.
 - Vercel environment check: required production env vars except Upstash are present.
 - Production login/API retest after deployment passed on `https://nanny-app.aistudioprojects.com`.
+- Custom-domain light check after coordination-only deploys: `/login` returns 200 and unauthenticated `/` redirects to `/login?next=%2F`.
 - Remaining gates before sharing with Tina: decide whether to share with voice transcription blocked, explicit Sean approval for email, and any requested morning feedback automation.
