@@ -287,3 +287,14 @@ Active Tina nanny-preview request, 2026-05-31:
 - Implementation decision: add a Tina-only dashboard segmented control rather than changing Tina's actual authenticated role.
 - Parent mode keeps Tina's command center and parent/admin dashboard items visible.
 - Nanny preview mode hides parent/admin dashboard items and the Tina command center, then shows the same simplified nanny-facing dashboard intro Faith sees.
+
+Active mobile source-page redesign, 2026-06-01:
+
+- Sean feedback: mobile source pages waste too much first-screen space on large add-entry forms; the actual existing items should be visible first, with a compact add action available.
+- Design-agent decision: source pages should default to review mode, not creation mode. Add/edit forms should be progressive disclosure surfaces opened by a small page action.
+- Design-agent decision: keep the language simple and operational: "Add Entry" as the default action, then page-specific save labels inside the form.
+- Implementer plan: apply the list-first/add-on-demand pattern across notes, chores, supplies, trackers, development, calendar, medication, milestones, admin reminders, and the care-manual AI draft panel; then run lint/build, push to `main`, deploy production, and email Tina.
+- Implementation update: source pages now default to the item list on mobile and expose compact `Add Entry` or `Generate Draft` actions in the page header; forms collapse after save or cancel and reopen for edits.
+- Implementation update: the mobile bottom navigation is now a horizontally scrollable glass-style tray with larger touch targets instead of an eight-column squeeze.
+- Local verification: `npm run lint`, `npm run build`, and `git diff --check` passed; the first rebuild hit a transient Windows `.next` EBUSY lock and then passed on retry.
+- Browser limitation: Playwright/Browser still cannot launch local Chrome in this desktop session, exiting with code 13 before page load; HTTP checks confirmed local `/login` returns 200 and protected source pages redirect to login.

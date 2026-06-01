@@ -10,7 +10,7 @@ export function PageHeader({
   children?: ReactNode;
 }) {
   return (
-    <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mb-4 flex flex-col items-start gap-2 sm:flex-row sm:items-end sm:justify-between">
       <div>
         {eyebrow ? (
           <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#d97706]">
@@ -25,4 +25,3 @@ export function PageHeader({
     </div>
   );
 }
-

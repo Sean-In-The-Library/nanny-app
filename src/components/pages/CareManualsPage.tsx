@@ -38,6 +38,7 @@ export function CareManualsPage() {
   const [summary, setSummary] = useState<SummaryResult | null>(null);
   const [aiBusy, setAiBusy] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [draftOpen, setDraftOpen] = useState(false);
 
   const manual = useMemo(
     () => data?.careManuals.find((item) => item.child === child),
@@ -102,6 +103,7 @@ export function CareManualsPage() {
 
     setSummary(null);
     setRawNotes("");
+    setDraftOpen(false);
   }
 
   async function updateSection(key: keyof typeof sectionLabels, value: string) {
@@ -124,7 +126,12 @@ export function CareManualsPage() {
 
   return (
     <AppShell>
-      <PageHeader eyebrow="Care source of truth" title="Care Manuals" />
+      <PageHeader eyebrow="Care source of truth" title="Care Manuals">
+        <ActionButton tone="quiet" onClick={() => setDraftOpen(true)}>
+          <WandSparkles size={16} aria-hidden />
+          Generate Draft
+        </ActionButton>
+      </PageHeader>
       <div className="mb-4 flex flex-wrap gap-2">
         {(["Kieran", "Connor"] as ChildName[]).map((name) => (
           <button
@@ -141,73 +148,86 @@ export function CareManualsPage() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-        <section className="rounded-3xl border border-[#f5bf7d] bg-[#fff3df] p-4 shadow-sm">
-          <div className="mb-3 flex items-center gap-2">
-            <ChildBadge child={child} />
-            <h2 className="text-lg font-black">Rough notes to manual</h2>
-          </div>
-          <VoiceNoteInput
-            onTranscript={(text) =>
-              setRawNotes((current) => [current, text].filter(Boolean).join("\n\n"))
-            }
-          />
-          <textarea
-            value={rawNotes}
-            onChange={(event) => setRawNotes(event.target.value)}
-            rows={8}
-            placeholder="Paste or record several days of schedule notes here."
-            className="mt-3 w-full rounded-2xl border border-[#dfd1bd] bg-white px-4 py-3 font-semibold"
-          />
-          <ActionButton
-            className="mt-3"
-            onClick={generateManual}
-            disabled={aiBusy || rawNotes.trim().length < 10}
-          >
-            {aiBusy ? <Loader2 className="animate-spin" size={16} aria-hidden /> : <WandSparkles size={16} aria-hidden />}
-            Generate Draft
-          </ActionButton>
-          {aiError ? (
-            <p className="mt-3 rounded-xl bg-[#fff0ee] px-3 py-2 text-sm font-bold text-[#b42318]">
-              {aiError}
-            </p>
-          ) : null}
-          {summary ? (
-            <div className="mt-4 space-y-3 rounded-2xl bg-white p-4 shadow-sm">
-              <div>
-                <h3 className="font-black">Generated manual draft</h3>
-                <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-[#536076]">
-                  {summary.summary}
-                </p>
-              </div>
-              <div>
-                <h3 className="font-black">Suggested schedule</h3>
-                <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-[#536076]">
-                  {summary.suggestedSchedule}
-                </p>
-              </div>
-              {summary.questions.length ? (
-                <div>
-                  <h3 className="font-black">Questions</h3>
-                  <ul className="mt-1 space-y-1 text-sm font-semibold text-[#7a4b12]">
-                    {summary.questions.map((question) => (
-                      <li key={question}>{question}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-              <ActionButton onClick={approveSummary} disabled={saving}>
-                Approve and Save
+        {draftOpen ? (
+          <section className="order-1 rounded-3xl border border-[#f5bf7d] bg-[#fff3df] p-4 shadow-sm">
+            <div className="mb-3 flex items-center gap-2">
+              <ChildBadge child={child} />
+              <h2 className="text-lg font-black">Rough notes to manual</h2>
+            </div>
+            <VoiceNoteInput
+              onTranscript={(text) =>
+                setRawNotes((current) => [current, text].filter(Boolean).join("\n\n"))
+              }
+            />
+            <textarea
+              value={rawNotes}
+              onChange={(event) => setRawNotes(event.target.value)}
+              rows={8}
+              placeholder="Paste or record several days of schedule notes here."
+              className="mt-3 w-full rounded-2xl border border-[#dfd1bd] bg-white px-4 py-3 font-semibold"
+            />
+            <div className="mt-3 flex flex-wrap gap-2">
+              <ActionButton
+                onClick={generateManual}
+                disabled={aiBusy || rawNotes.trim().length < 10}
+              >
+                {aiBusy ? <Loader2 className="animate-spin" size={16} aria-hidden /> : <WandSparkles size={16} aria-hidden />}
+                Generate Draft
+              </ActionButton>
+              <ActionButton
+                tone="quiet"
+                onClick={() => {
+                  setDraftOpen(false);
+                  setSummary(null);
+                  setAiError(null);
+                }}
+              >
+                Cancel
               </ActionButton>
             </div>
-          ) : null}
-          {error ? (
-            <p className="mt-3 rounded-xl bg-[#fff0ee] px-3 py-2 text-sm font-bold text-[#b42318]">
-              {error}
-            </p>
-          ) : null}
-        </section>
+            {aiError ? (
+              <p className="mt-3 rounded-xl bg-[#fff0ee] px-3 py-2 text-sm font-bold text-[#b42318]">
+                {aiError}
+              </p>
+            ) : null}
+            {summary ? (
+              <div className="mt-4 space-y-3 rounded-2xl bg-white p-4 shadow-sm">
+                <div>
+                  <h3 className="font-black">Generated manual draft</h3>
+                  <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-[#536076]">
+                    {summary.summary}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-black">Suggested schedule</h3>
+                  <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-[#536076]">
+                    {summary.suggestedSchedule}
+                  </p>
+                </div>
+                {summary.questions.length ? (
+                  <div>
+                    <h3 className="font-black">Questions</h3>
+                    <ul className="mt-1 space-y-1 text-sm font-semibold text-[#7a4b12]">
+                      {summary.questions.map((question) => (
+                        <li key={question}>{question}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                <ActionButton onClick={approveSummary} disabled={saving}>
+                  Approve and Save
+                </ActionButton>
+              </div>
+            ) : null}
+            {error ? (
+              <p className="mt-3 rounded-xl bg-[#fff0ee] px-3 py-2 text-sm font-bold text-[#b42318]">
+                {error}
+              </p>
+            ) : null}
+          </section>
+        ) : null}
 
-        <section className="space-y-3">
+        <section className={draftOpen ? "order-2 space-y-3" : "space-y-3"}>
           {loading || !manual ? (
             <EmptyState text="Loading care manual..." />
           ) : (
@@ -236,4 +256,3 @@ export function CareManualsPage() {
     </AppShell>
   );
 }
-

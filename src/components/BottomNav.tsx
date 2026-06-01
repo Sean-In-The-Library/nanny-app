@@ -37,11 +37,8 @@ export function BottomNav() {
   );
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-[#ddceb6] bg-[#fffaf0]/95 px-2 py-2 shadow-[0_-8px_24px_rgba(23,32,51,0.08)] backdrop-blur">
-      <div
-        className="mx-auto grid max-w-3xl gap-1"
-        style={{ gridTemplateColumns: `repeat(${visibleNavItems.length}, minmax(0, 1fr))` }}
-      >
+    <nav className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[calc(env(safe-area-inset-bottom)+0.55rem)] pt-2">
+      <div className="mx-auto flex max-w-3xl gap-1 overflow-x-auto rounded-2xl border border-[#ddceb6] bg-white/90 p-1 shadow-[0_-10px_28px_rgba(23,32,51,0.12)] backdrop-blur-xl">
         {visibleNavItems.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href;
@@ -50,9 +47,9 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               title={item.label}
-              className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 text-[11px] font-semibold transition ${
+              className={`flex min-h-[3.25rem] min-w-[4.4rem] flex-col items-center justify-center gap-1 rounded-xl px-2 text-[11px] font-black transition ${
                 active
-                  ? "bg-[#2f83c5] text-white"
+                  ? "bg-[#2f83c5] text-white shadow-sm"
                   : "text-[#536076] hover:bg-[#eef6ef]"
               }`}
             >

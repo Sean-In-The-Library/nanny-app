@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { ActionButton } from "../ActionButton";
 import { AppShell } from "../AppShell";
@@ -27,6 +28,7 @@ const blankForm = {
 export function ChoresPage() {
   const { data, loading, saving, error, updateData } = useAppData();
   const [form, setForm] = useState(blankForm);
+  const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -62,6 +64,7 @@ export function ChoresPage() {
 
     setForm(blankForm);
     setEditingId(null);
+    setFormOpen(false);
   }
 
   async function complete(id: string) {
@@ -90,6 +93,7 @@ export function ChoresPage() {
 
   function edit(chore: Chore) {
     setEditingId(chore.id);
+    setFormOpen(true);
     setForm({
       title: chore.title,
       description: chore.description,
@@ -100,17 +104,35 @@ export function ChoresPage() {
     });
   }
 
+  function startAdd() {
+    setEditingId(null);
+    setForm(blankForm);
+    setFormOpen(true);
+  }
+
+  function closeForm() {
+    setEditingId(null);
+    setForm(blankForm);
+    setFormOpen(false);
+  }
+
   return (
     <AppShell>
-      <PageHeader eyebrow="Recurring work" title="Chores" />
+      <PageHeader eyebrow="Recurring work" title="Chores">
+        <ActionButton tone="quiet" onClick={startAdd}>
+          <Plus size={16} aria-hidden />
+          Add Entry
+        </ActionButton>
+      </PageHeader>
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <form
-          onSubmit={submit}
-          className="rounded-3xl border border-[#e8d7bd] bg-[#fffaf0] p-4 shadow-sm"
-        >
-          <h2 className="mb-3 text-lg font-black">
-            {editingId ? "Edit chore" : "Add chore"}
-          </h2>
+        {formOpen ? (
+          <form
+            onSubmit={submit}
+            className="order-1 rounded-3xl border border-[#e8d7bd] bg-[#fffaf0] p-4 shadow-sm"
+          >
+            <h2 className="mb-3 text-lg font-black">
+              {editingId ? "Edit chore" : "Add chore"}
+            </h2>
           <label className="mb-3 block">
             <span className="mb-1 block text-sm font-black">Task</span>
             <input
@@ -173,30 +195,23 @@ export function ChoresPage() {
             />
             Show when due
           </label>
-          <div className="flex flex-wrap gap-2">
-            <ActionButton type="submit" disabled={saving}>
-              Save Chore
-            </ActionButton>
-            {editingId ? (
-              <ActionButton
-                tone="quiet"
-                onClick={() => {
-                  setEditingId(null);
-                  setForm(blankForm);
-                }}
-              >
+            <div className="flex flex-wrap gap-2">
+              <ActionButton type="submit" disabled={saving}>
+                Save Chore
+              </ActionButton>
+              <ActionButton tone="quiet" onClick={closeForm}>
                 Cancel
               </ActionButton>
-            ) : null}
-          </div>
+            </div>
           {error ? (
             <p className="mt-3 rounded-xl bg-[#fff0ee] px-3 py-2 text-sm font-bold text-[#b42318]">
               {error}
             </p>
           ) : null}
-        </form>
+          </form>
+        ) : null}
 
-        <section className="space-y-3">
+        <section className={formOpen ? "order-2 space-y-3" : "space-y-3"}>
           {loading || !data ? (
             <EmptyState text="Loading chores..." />
           ) : data.chores.length ? (
@@ -238,4 +253,3 @@ export function ChoresPage() {
     </AppShell>
   );
 }
-

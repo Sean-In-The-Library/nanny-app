@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { ActionButton } from "../ActionButton";
@@ -22,6 +23,7 @@ const blankForm = {
 export function CalendarPage() {
   const { data, loading, saving, error, updateData } = useAppData();
   const [form, setForm] = useState(blankForm);
+  const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -55,6 +57,7 @@ export function CalendarPage() {
 
     setForm(blankForm);
     setEditingId(null);
+    setFormOpen(false);
   }
 
   async function remove(id: string) {
@@ -66,6 +69,7 @@ export function CalendarPage() {
 
   function edit(item: CalendarEvent) {
     setEditingId(item.id);
+    setFormOpen(true);
     setForm({
       title: item.title,
       description: item.description ?? "",
@@ -76,10 +80,26 @@ export function CalendarPage() {
     });
   }
 
+  function startAdd() {
+    setEditingId(null);
+    setForm(blankForm);
+    setFormOpen(true);
+  }
+
+  function closeForm() {
+    setEditingId(null);
+    setForm(blankForm);
+    setFormOpen(false);
+  }
+
   return (
     <AppShell>
       <PageHeader eyebrow="More" title="Calendar">
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <ActionButton tone="quiet" onClick={startAdd}>
+            <Plus size={16} aria-hidden />
+            Add Entry
+          </ActionButton>
           <Link className="rounded-xl bg-white px-3 py-2 text-sm font-black text-[#314057]" href="/medication">
             Medication
           </Link>
@@ -89,13 +109,14 @@ export function CalendarPage() {
         </div>
       </PageHeader>
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <form
-          onSubmit={submit}
-          className="rounded-3xl border border-[#e8d7bd] bg-[#fffaf0] p-4 shadow-sm"
-        >
-          <h2 className="mb-3 text-lg font-black">
-            {editingId ? "Edit event" : "Add event"}
-          </h2>
+        {formOpen ? (
+          <form
+            onSubmit={submit}
+            className="order-1 rounded-3xl border border-[#e8d7bd] bg-[#fffaf0] p-4 shadow-sm"
+          >
+            <h2 className="mb-3 text-lg font-black">
+              {editingId ? "Edit event" : "Add event"}
+            </h2>
           <label className="mb-3 block">
             <span className="mb-1 block text-sm font-black">Title</span>
             <input
@@ -167,30 +188,23 @@ export function CalendarPage() {
             />
             Show on dashboard
           </label>
-          <div className="flex flex-wrap gap-2">
-            <ActionButton type="submit" disabled={saving}>
-              Save Event
-            </ActionButton>
-            {editingId ? (
-              <ActionButton
-                tone="quiet"
-                onClick={() => {
-                  setEditingId(null);
-                  setForm(blankForm);
-                }}
-              >
+            <div className="flex flex-wrap gap-2">
+              <ActionButton type="submit" disabled={saving}>
+                Save Event
+              </ActionButton>
+              <ActionButton tone="quiet" onClick={closeForm}>
                 Cancel
               </ActionButton>
-            ) : null}
-          </div>
+            </div>
           {error ? (
             <p className="mt-3 rounded-xl bg-[#fff0ee] px-3 py-2 text-sm font-bold text-[#b42318]">
               {error}
             </p>
           ) : null}
-        </form>
+          </form>
+        ) : null}
 
-        <section className="space-y-3">
+        <section className={formOpen ? "order-2 space-y-3" : "space-y-3"}>
           {loading || !data ? (
             <EmptyState text="Loading calendar..." />
           ) : data.calendarEvents.length ? (
@@ -232,4 +246,3 @@ export function CalendarPage() {
     </AppShell>
   );
 }
-

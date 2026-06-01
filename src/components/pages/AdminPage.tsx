@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { ActionButton } from "../ActionButton";
 import { AppShell } from "../AppShell";
@@ -31,6 +32,7 @@ export function AdminPage() {
   const { data, loading, saving, error, updateData } = useAppData();
   const { user } = useSession();
   const [form, setForm] = useState(blankForm);
+  const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -66,6 +68,7 @@ export function AdminPage() {
 
     setForm(blankForm);
     setEditingId(null);
+    setFormOpen(false);
   }
 
   async function setStatus(id: string, status: AdminItem["status"]) {
@@ -92,6 +95,7 @@ export function AdminPage() {
 
   function edit(item: AdminItem) {
     setEditingId(item.id);
+    setFormOpen(true);
     setForm({
       title: item.title,
       details: item.details,
@@ -100,6 +104,18 @@ export function AdminPage() {
       owner: item.owner,
       showOnDashboard: item.showOnDashboard,
     });
+  }
+
+  function startAdd() {
+    setEditingId(null);
+    setForm(blankForm);
+    setFormOpen(true);
+  }
+
+  function closeForm() {
+    setEditingId(null);
+    setForm(blankForm);
+    setFormOpen(false);
   }
 
   const items = data?.adminItems.slice().sort((a, b) => {
@@ -121,15 +137,21 @@ export function AdminPage() {
 
   return (
     <AppShell>
-      <PageHeader eyebrow="Household admin" title="Nanny admin" />
+      <PageHeader eyebrow="Household admin" title="Nanny admin">
+        <ActionButton tone="quiet" onClick={startAdd}>
+          <Plus size={16} aria-hidden />
+          Add Entry
+        </ActionButton>
+      </PageHeader>
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <form
-          onSubmit={submit}
-          className="rounded-3xl border border-[#e8d7bd] bg-[#fffaf0] p-4 shadow-sm"
-        >
-          <h2 className="mb-3 text-lg font-black">
-            {editingId ? "Edit reminder" : "Add admin reminder"}
-          </h2>
+        {formOpen ? (
+          <form
+            onSubmit={submit}
+            className="order-1 rounded-3xl border border-[#e8d7bd] bg-[#fffaf0] p-4 shadow-sm"
+          >
+            <h2 className="mb-3 text-lg font-black">
+              {editingId ? "Edit reminder" : "Add admin reminder"}
+            </h2>
           <label className="mb-3 block">
             <span className="mb-1 block text-sm font-black">Title</span>
             <input
@@ -206,30 +228,23 @@ export function AdminPage() {
             />
             Show on dashboard
           </label>
-          <div className="flex flex-wrap gap-2">
-            <ActionButton type="submit" disabled={saving}>
-              Save Reminder
-            </ActionButton>
-            {editingId ? (
-              <ActionButton
-                tone="quiet"
-                onClick={() => {
-                  setEditingId(null);
-                  setForm(blankForm);
-                }}
-              >
+            <div className="flex flex-wrap gap-2">
+              <ActionButton type="submit" disabled={saving}>
+                Save Reminder
+              </ActionButton>
+              <ActionButton tone="quiet" onClick={closeForm}>
                 Cancel
               </ActionButton>
-            ) : null}
-          </div>
+            </div>
           {error ? (
             <p className="mt-3 rounded-xl bg-[#fff0ee] px-3 py-2 text-sm font-bold text-[#b42318]">
               {error}
             </p>
           ) : null}
-        </form>
+          </form>
+        ) : null}
 
-        <section className="space-y-3">
+        <section className={formOpen ? "order-2 space-y-3" : "space-y-3"}>
           {loading || !items ? (
             <EmptyState text="Loading admin reminders..." />
           ) : items.length ? (

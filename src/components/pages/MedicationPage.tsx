@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { ActionButton } from "../ActionButton";
 import { AppShell } from "../AppShell";
@@ -23,9 +24,17 @@ const blankForm = {
   notes: "",
 };
 
+function createBlankForm() {
+  return {
+    ...blankForm,
+    givenAt: toDatetimeLocalValue(new Date().toISOString()),
+  };
+}
+
 export function MedicationPage() {
   const { data, loading, saving, error, updateData } = useAppData();
-  const [form, setForm] = useState(blankForm);
+  const [form, setForm] = useState(createBlankForm);
+  const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -59,11 +68,9 @@ export function MedicationPage() {
       };
     });
 
-    setForm({
-      ...blankForm,
-      givenAt: toDatetimeLocalValue(new Date().toISOString()),
-    });
+    setForm(createBlankForm());
     setEditingId(null);
+    setFormOpen(false);
   }
 
   async function remove(id: string) {
@@ -75,6 +82,7 @@ export function MedicationPage() {
 
   function edit(entry: MedicationEntry) {
     setEditingId(entry.id);
+    setFormOpen(true);
     setForm({
       child: entry.child,
       medicineName: entry.medicineName,
@@ -87,21 +95,39 @@ export function MedicationPage() {
     });
   }
 
+  function startAdd() {
+    setEditingId(null);
+    setForm(createBlankForm());
+    setFormOpen(true);
+  }
+
+  function closeForm() {
+    setEditingId(null);
+    setForm(createBlankForm());
+    setFormOpen(false);
+  }
+
   return (
     <AppShell>
-      <PageHeader eyebrow="Health" title="Medication" />
+      <PageHeader eyebrow="Health" title="Medication">
+        <ActionButton tone="quiet" onClick={startAdd}>
+          <Plus size={16} aria-hidden />
+          Add Entry
+        </ActionButton>
+      </PageHeader>
       <div className="mb-4 rounded-2xl border border-[#f3a5a5] bg-[#fff0ee] p-4 text-sm font-bold leading-6 text-[#7a271a]">
         This app only tracks logged entries. Always follow medication labels,
         pediatrician guidance, and caregiver judgment.
       </div>
       <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <form
-          onSubmit={submit}
-          className="rounded-3xl border border-[#e8d7bd] bg-[#fffaf0] p-4 shadow-sm"
-        >
-          <h2 className="mb-3 text-lg font-black">
-            {editingId ? "Edit entry" : "Log medicine"}
-          </h2>
+        {formOpen ? (
+          <form
+            onSubmit={submit}
+            className="order-1 rounded-3xl border border-[#e8d7bd] bg-[#fffaf0] p-4 shadow-sm"
+          >
+            <h2 className="mb-3 text-lg font-black">
+              {editingId ? "Edit entry" : "Log medicine"}
+            </h2>
           <div className="mb-3 grid gap-3 sm:grid-cols-2">
             <label>
               <span className="mb-1 block text-sm font-black">Child</span>
@@ -170,30 +196,23 @@ export function MedicationPage() {
               className="w-full rounded-2xl border border-[#dfd1bd] bg-white px-4 py-3 font-semibold"
             />
           </label>
-          <div className="flex flex-wrap gap-2">
-            <ActionButton type="submit" disabled={saving}>
-              Save Entry
-            </ActionButton>
-            {editingId ? (
-              <ActionButton
-                tone="quiet"
-                onClick={() => {
-                  setEditingId(null);
-                  setForm(blankForm);
-                }}
-              >
+            <div className="flex flex-wrap gap-2">
+              <ActionButton type="submit" disabled={saving}>
+                Save Entry
+              </ActionButton>
+              <ActionButton tone="quiet" onClick={closeForm}>
                 Cancel
               </ActionButton>
-            ) : null}
-          </div>
+            </div>
           {error ? (
             <p className="mt-3 rounded-xl bg-[#fff0ee] px-3 py-2 text-sm font-bold text-[#b42318]">
               {error}
             </p>
           ) : null}
-        </form>
+          </form>
+        ) : null}
 
-        <section className="space-y-3">
+        <section className={formOpen ? "order-2 space-y-3" : "space-y-3"}>
           {loading || !data ? (
             <EmptyState text="Loading medication..." />
           ) : data.medicationEntries.length ? (
@@ -250,4 +269,3 @@ export function MedicationPage() {
     </AppShell>
   );
 }
-

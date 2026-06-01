@@ -18,15 +18,15 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f2e8] text-[#172033]">
-      <header className="sticky top-0 z-30 border-b border-[#e6dbc7] bg-[#fffaf0]/95 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+    <div className="min-h-screen bg-[#f7f4ee] text-[#172033]">
+      <header className="sticky top-0 z-30 border-b border-[#e6dbc7]/80 bg-white/85 backdrop-blur-xl">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#3a9fd9] text-white shadow-sm">
-              <Menu size={20} aria-hidden />
+            <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#2f83c5] text-white shadow-sm">
+              <Menu size={18} aria-hidden />
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#314057]">Family Nanny Hub</p>
+              <p className="text-sm font-black text-[#172033]">Family Nanny Hub</p>
               <p className="text-xs text-[#667085]">
                 {user ? `${user.name} ${user.role === "parent" ? "parent" : "nanny"} view` : "Loading"}
               </p>
@@ -51,4 +51,3 @@ export function AppShell({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
