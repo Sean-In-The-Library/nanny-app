@@ -329,5 +329,9 @@ Active integrated two-agent UX/deploy pass, 2026-06-02:
 - Local verification: `npm run lint`, `npm run build`, and `git diff --check` passed after integration.
 - Browser mobile QA used a temporary local server on port 3001 with non-production test passwords. Tina parent login passed; Home shortcuts were visible before the feed; the Note shortcut opened the add form immediately; Quick and More were tested; Faith login passed; Faith More hid Admin; Faith `/api/data` returned zero admin items.
 - Temporary local test server and generated QA logs were stopped/removed after testing.
-- Vercel CLI check: `vercel --version` returned `54.6.1`; production deploy remains pending until this integrated pass is committed and pushed.
+- GitHub push: commit `83282c4` (`Streamline mobile nanny workflows`) was pushed to `origin/main`.
+- Vercel production deployment: `dpl_2e4j6aSuxThTpuPjFC4nr9sBS5cX` is `READY` at `https://nanny-app-8gy6-dc1txgpbv-seans-projects-3ff264cf.vercel.app` and aliased to `https://nanny-app.aistudioprojects.com`.
+- Production custom-domain smoke: `/login` returned 200, unauthenticated `/` redirected to `/login?next=%2F`, and unauthenticated `/api/data` redirected to `/login?next=%2Fapi%2Fdata`.
+- Vercel error-log scan: `vercel logs https://nanny-app.aistudioprojects.com --since 30m --level error` returned no logs.
+- Vercel CLI check: `vercel --version` returned `54.6.1`.
 - Known remaining blocker: production OpenAI transcription may still return the prior OpenAI organization/API-key 401 until the production key/org access is corrected; this pass did not retest model transcription.
