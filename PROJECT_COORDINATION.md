@@ -335,3 +335,15 @@ Active integrated two-agent UX/deploy pass, 2026-06-02:
 - Vercel error-log scan: `vercel logs https://nanny-app.aistudioprojects.com --since 30m --level error` returned no logs.
 - Vercel CLI check: `vercel --version` returned `54.6.1`.
 - Known remaining blocker: production OpenAI transcription may still return the prior OpenAI organization/API-key 401 until the production key/org access is corrected; this pass did not retest model transcription.
+
+Active mobile dictation/actionization pass, 2026-06-02:
+
+- Sean asked whether Tina can use the iPhone/Android path as a practical mom workflow: tap `Dictate`, speak, and have the app turn that into actionable nanny items; if not, determine why and make the fallback useful.
+- Implementation update: on mobile, the Tina command center now appears before the focus feed, so the parent workflow is immediately below the quick actions instead of below the full dashboard.
+- Implementation update: the `Dictate` button now turns browser microphone blocks into a usable message: use the phone keyboard microphone in the text box, then tap `Make Items`.
+- Backend update: OpenRouter actionization now retries once after transient fetch failures.
+- Backend update: if OpenRouter is missing or unreachable, `/api/ai/actionize-dictation` locally sorts obvious nanny phrases into reviewable tracker, supply, chore, and development drafts instead of collapsing the whole transcript into one generic note.
+- Browser mobile QA used a temporary local server on port 3003 at 390x844 with non-production test credentials. Tina parent login passed; the command center was visible above the feed; `Dictate` produced the expected microphone-blocked fallback message in the test browser; typed transcript -> `Make Items` produced four selected drafts; `Save Selected` persisted the rash tracker, wipes supply item, Wonder Wagon chore, and Kieran development reminder into the dashboard.
+- Local OpenRouter behavior: the same transcript also produced four structured AI drafts when OpenRouter was reachable. Earlier local calls showed intermittent OpenRouter network timeouts, so the local sorter is still necessary as a reliability fallback.
+- Verification after implementation: `npm run lint`, `npm run build`, and `git diff --check` passed locally.
+- Production deploy and Tina email remain pending for this pass.

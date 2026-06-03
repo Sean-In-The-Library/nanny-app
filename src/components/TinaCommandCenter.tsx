@@ -115,7 +115,7 @@ export function TinaCommandCenter({
     };
     recognition.onerror = (event) => {
       setLiveDictating(false);
-      setError(event.error ? `Live dictation stopped: ${event.error}.` : "Live dictation stopped.");
+      setError(formatLiveDictationError(event.error));
     };
     recognition.onend = () => {
       setLiveDictating(false);
@@ -271,6 +271,20 @@ export function TinaCommandCenter({
         Array.isArray(payload.drafts) &&
         Array.isArray(payload.questions),
     );
+  }
+
+  function formatLiveDictationError(errorCode?: string) {
+    if (errorCode === "not-allowed" || errorCode === "service-not-allowed") {
+      return "Microphone access was blocked. Use the phone keyboard mic in the text box, then tap Make Items.";
+    }
+
+    if (errorCode === "no-speech") {
+      return "No speech was detected. Try Dictate again or use the text box.";
+    }
+
+    return errorCode
+      ? `Live dictation stopped: ${errorCode}.`
+      : "Live dictation stopped.";
   }
 
   async function saveSelectedDrafts() {

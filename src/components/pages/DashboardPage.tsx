@@ -234,7 +234,7 @@ function DashboardContent({
       {isNannyPreview ? <NannyPreviewBanner /> : null}
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.45fr)_minmax(330px,0.85fr)] xl:items-start">
-        <main className="space-y-4">
+        <main className="order-2 space-y-4 xl:order-1">
           <FocusFeed
             dashboard={dashboard}
             activeBucket={activeBucket}
@@ -248,7 +248,7 @@ function DashboardContent({
           />
         </main>
 
-        <aside className="space-y-4 xl:sticky xl:top-24">
+        <aside className="order-1 space-y-4 xl:sticky xl:top-24 xl:order-2">
           {isParent ? (
             <TinaCommandCenter data={data} saving={saving} onSave={onSave} />
           ) : (
