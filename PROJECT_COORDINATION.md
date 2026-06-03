@@ -346,4 +346,9 @@ Active mobile dictation/actionization pass, 2026-06-02:
 - Browser mobile QA used a temporary local server on port 3003 at 390x844 with non-production test credentials. Tina parent login passed; the command center was visible above the feed; `Dictate` produced the expected microphone-blocked fallback message in the test browser; typed transcript -> `Make Items` produced four selected drafts; `Save Selected` persisted the rash tracker, wipes supply item, Wonder Wagon chore, and Kieran development reminder into the dashboard.
 - Local OpenRouter behavior: the same transcript also produced four structured AI drafts when OpenRouter was reachable. Earlier local calls showed intermittent OpenRouter network timeouts, so the local sorter is still necessary as a reliability fallback.
 - Verification after implementation: `npm run lint`, `npm run build`, and `git diff --check` passed locally.
-- Production deploy and Tina email remain pending for this pass.
+- GitHub push: commit `f6032fd` (`Improve mobile dictation reliability`) was pushed to `origin/main`.
+- Vercel production deployment: `dpl_EuB7u5uTDBkPgMYd6z9UJH5cziNe` was `READY` and aliased to `https://nanny-app.aistudioprojects.com`.
+- Production custom-domain smoke: `/login` returned 200, unauthenticated `/` redirected to `/login?next=%2F`, and unauthenticated `/api/data` redirected to `/login?next=%2Fapi%2Fdata`.
+- Browser production mobile smoke: `https://nanny-app.aistudioprojects.com/login` rendered correctly at 390x844.
+- Vercel error-log scan: `npx vercel logs https://nanny-app.aistudioprojects.com --since 30m --level error --scope seans-projects-3ff264cf` returned no logs.
+- Tina email follow-up: updated the existing one-time heartbeat `send-tina-nanny-app-update` for 2026-06-03 8:00 AM Phoenix time. The scheduled email explains the new Home quick actions, the Tina command center, the phone-keyboard-microphone fallback, and Faith's simpler nanny view.
