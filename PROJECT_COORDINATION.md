@@ -347,7 +347,7 @@ Active mobile dictation/actionization pass, 2026-06-02:
 - Local OpenRouter behavior: the same transcript also produced four structured AI drafts when OpenRouter was reachable. Earlier local calls showed intermittent OpenRouter network timeouts, so the local sorter is still necessary as a reliability fallback.
 - Verification after implementation: `npm run lint`, `npm run build`, and `git diff --check` passed locally.
 - GitHub push: commit `f6032fd` (`Improve mobile dictation reliability`) was pushed to `origin/main`.
-- Vercel production deployment: `dpl_EuB7u5uTDBkPgMYd6z9UJH5cziNe` was `READY` and aliased to `https://nanny-app.aistudioprojects.com`.
+- Vercel production deployment: final deployment `dpl_6dfW3he4S3v3rAeQGW4NTZH8Jw9A` was `READY` and aliased to `https://nanny-app.aistudioprojects.com`.
 - Production custom-domain smoke: `/login` returned 200, unauthenticated `/` redirected to `/login?next=%2F`, and unauthenticated `/api/data` redirected to `/login?next=%2Fapi%2Fdata`.
 - Browser production mobile smoke: `https://nanny-app.aistudioprojects.com/login` rendered correctly at 390x844.
 - Vercel error-log scan: `npx vercel logs https://nanny-app.aistudioprojects.com --since 30m --level error --scope seans-projects-3ff264cf` returned no logs.
