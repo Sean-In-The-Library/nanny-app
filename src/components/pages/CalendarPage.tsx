@@ -8,6 +8,7 @@ import { AppShell } from "../AppShell";
 import { EmptyState } from "../EmptyState";
 import { PageHeader } from "../PageHeader";
 import { useAppData } from "@/hooks/useAppData";
+import { useOpenEntryFromQuery } from "@/hooks/useOpenEntryFromQuery";
 import { formatDateTime, toDatetimeLocalValue } from "@/lib/dateUtils";
 import type { CalendarCategory, CalendarEvent } from "@/lib/types";
 
@@ -92,6 +93,8 @@ export function CalendarPage() {
     setFormOpen(false);
   }
 
+  useOpenEntryFromQuery(startAdd);
+
   return (
     <AppShell>
       <PageHeader eyebrow="More" title="Calendar">
@@ -108,11 +111,11 @@ export function CalendarPage() {
           </Link>
         </div>
       </PageHeader>
-      <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] lg:items-start">
         {formOpen ? (
           <form
             onSubmit={submit}
-            className="order-1 rounded-3xl border border-[#e8d7bd] bg-[#fffaf0] p-4 shadow-sm"
+            className="rounded-2xl border border-[#e8d7bd] bg-[#fffaf0] p-4 shadow-sm lg:order-2 lg:sticky lg:top-20"
           >
             <h2 className="mb-3 text-lg font-black">
               {editingId ? "Edit event" : "Add event"}
@@ -204,7 +207,7 @@ export function CalendarPage() {
           </form>
         ) : null}
 
-        <section className={formOpen ? "order-2 space-y-3" : "space-y-3"}>
+        <section className={formOpen ? "space-y-3 lg:order-1" : "space-y-3"}>
           {loading || !data ? (
             <EmptyState text="Loading calendar..." />
           ) : data.calendarEvents.length ? (
@@ -217,7 +220,7 @@ export function CalendarPage() {
               .map((item) => (
                 <article
                   key={item.id}
-                  className="rounded-3xl border border-[#e8d7bd] bg-white p-4 shadow-sm"
+                  className="rounded-2xl border border-[#e8d7bd] bg-white p-4 shadow-sm"
                 >
                   <h3 className="text-lg font-black">{item.title}</h3>
                   <p className="mt-1 text-sm font-bold text-[#667085]">

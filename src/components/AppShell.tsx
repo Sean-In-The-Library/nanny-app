@@ -4,6 +4,7 @@ import { LogOut, Menu } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { BottomNav } from "./BottomNav";
+import { QuickActionDock } from "./QuickActions";
 import { useSession } from "@/hooks/useSession";
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -47,6 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="mx-auto w-full max-w-6xl px-4 pb-28 pt-4 sm:px-6 lg:px-8">
         {children}
       </main>
+      <QuickActionDock />
       <BottomNav />
     </div>
   );

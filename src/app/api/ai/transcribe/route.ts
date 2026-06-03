@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
+import { requireApiSession } from "@/lib/apiAuth";
 
 const MAX_TRANSCRIBE_UPLOAD_BYTES = 4 * 1024 * 1024;
 
 export async function POST(request: Request) {
+  const session = await requireApiSession();
+  if (session.response) {
+    return session.response;
+  }
+
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(

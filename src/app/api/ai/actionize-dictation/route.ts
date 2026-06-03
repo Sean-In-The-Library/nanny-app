@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireApiSession } from "@/lib/apiAuth";
 import { actionizeSchema } from "@/lib/schemas";
 import { callOpenRouterJson } from "@/lib/openrouter";
 import type { ActionDraft } from "@/lib/types";
@@ -10,6 +11,11 @@ type ActionizeResponse = {
 };
 
 export async function POST(request: Request) {
+  const session = await requireApiSession();
+  if (session.response) {
+    return session.response;
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = actionizeSchema.safeParse(body);
 
@@ -104,4 +110,3 @@ function fallbackActionize(transcript: string): ActionizeResponse {
     questions: [],
   };
 }
-

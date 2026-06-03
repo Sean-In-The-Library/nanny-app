@@ -298,3 +298,36 @@ Active mobile source-page redesign, 2026-06-01:
 - Implementation update: the mobile bottom navigation is now a horizontally scrollable glass-style tray with larger touch targets instead of an eight-column squeeze.
 - Local verification: `npm run lint`, `npm run build`, and `git diff --check` passed; the first rebuild hit a transient Windows `.next` EBUSY lock and then passed on retry.
 - Browser limitation: Playwright/Browser still cannot launch local Chrome in this desktop session, exiting with code 13 before page load; HTTP checks confirmed local `/login` returns 200 and protected source pages redirect to login.
+
+Active backend/Vercel readiness pass, 2026-06-02:
+
+- Backend agent reviewed this coordination file first and stayed inside backend/API/storage/docs ownership.
+- Vercel CLI is available in this shell at `C:\Users\seane\AppData\Roaming\npm\vercel.ps1`; `vercel --version` returned `54.6.1`.
+- Implementation update: API routes now enforce route-handler session checks in addition to `src/proxy.ts`; production still redirects unauthenticated requests at the proxy layer before handlers run.
+- Implementation update: `/api/data` now filters parent-only `adminItems` out of nanny responses and preserves existing admin reminders on nanny writes, so Faith's backend view matches the parent/admin privacy boundary already used in the UI.
+- No deploy, commit, push, or email was performed in this pass.
+
+Active front-end mobile UX pass, 2026-06-02:
+
+- Front-end agent reviewed this coordination file first and stayed inside front-end UI/components/page-shell ownership while preserving concurrent backend/API changes.
+- Implementation update: dashboard now uses role-aware quick actions, with Tina/Sean parent shortcuts and Faith/nanny shortcuts aligned to common daily tasks.
+- Implementation update: the bottom nav now keeps Home, Notes, Chores, Track, and More as the primary mobile tray; secondary routes remain available in a role-aware More panel.
+- Implementation update: source pages keep existing items visually first and move add/edit forms into a secondary sticky panel when opened; quick-action query links open the appropriate add/draft panel once and then clean the URL.
+- Verification: `npm run lint`, `npm run build`, and `git diff --check` passed locally.
+- Browser smoke: local `/login` rendered at mobile size, Faith login mode toggled, and `/notes?new=1` redirected unauthenticated users to `/login?next=%2Fnotes%3Fnew%3D1`.
+- Browser blocker: authenticated dashboard visual QA could not be completed because no local Tina password env var was present in `.env.local` or `.env`; no production credentials were used or printed.
+- No deploy, commit, push, or email was performed in this pass.
+
+Active integrated two-agent UX/deploy pass, 2026-06-02:
+
+- Sean requested a full expert mobile UX streamlining pass with two spawned agents: front-end and backend/Vercel.
+- Product decision: common parent/nanny actions should be reachable from Home or the floating Quick menu in one tap, with source pages still list-first unless the user explicitly chooses to add something.
+- Implementation update: added role-aware quick actions, a floating Quick menu, a More bottom-nav sheet, and `?new=1` / `?draft=1` direct-open behavior across source pages.
+- Implementation correction after Browser QA: add/draft panels now appear immediately under the header on mobile after a shortcut or `Add Entry`, while desktop keeps the sticky secondary-panel layout.
+- Implementation update: Quick and More menus now close each other so mobile overlays do not stack.
+- Backend update: API route handlers now require a session directly, and `/api/data` hides parent-only `adminItems` from nanny reads while preserving parent admin reminders on nanny writes.
+- Local verification: `npm run lint`, `npm run build`, and `git diff --check` passed after integration.
+- Browser mobile QA used a temporary local server on port 3001 with non-production test passwords. Tina parent login passed; Home shortcuts were visible before the feed; the Note shortcut opened the add form immediately; Quick and More were tested; Faith login passed; Faith More hid Admin; Faith `/api/data` returned zero admin items.
+- Temporary local test server and generated QA logs were stopped/removed after testing.
+- Vercel CLI check: `vercel --version` returned `54.6.1`; production deploy remains pending until this integrated pass is committed and pushed.
+- Known remaining blocker: production OpenAI transcription may still return the prior OpenAI organization/API-key 401 until the production key/org access is corrected; this pass did not retest model transcription.

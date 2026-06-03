@@ -11,6 +11,7 @@ import {
   ListFilter,
   PackageOpen,
   Pill,
+  Plus,
   Sparkles,
   StickyNote,
   TimerReset,
@@ -22,6 +23,7 @@ import { AppShell } from "../AppShell";
 import { EmptyState } from "../EmptyState";
 import { PageHeader } from "../PageHeader";
 import { PriorityPill } from "../PriorityPill";
+import { QuickActionStrip } from "../QuickActions";
 import { TinaCommandCenter } from "../TinaCommandCenter";
 import { useAppData } from "@/hooks/useAppData";
 import { useSession } from "@/hooks/useSession";
@@ -165,9 +167,10 @@ export function DashboardPage() {
             <ViewModeToggle value={viewMode} onChange={setViewMode} />
           ) : null}
           <Link
-            href="/notes"
+            href="/notes?new=1"
             className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2f83c5] px-4 text-sm font-black text-white shadow-sm transition hover:bg-[#246ca3]"
           >
+            <Plus size={16} aria-hidden />
             Add Note
           </Link>
         </div>
@@ -226,11 +229,7 @@ function DashboardContent({
         </p>
       ) : null}
 
-      <PriorityOverview
-        dashboard={dashboard}
-        activeBucket={activeBucket}
-        onBucketChange={onBucketChange}
-      />
+      <QuickActionStrip mode={isParent ? "parent" : "nanny"} />
 
       {isNannyPreview ? <NannyPreviewBanner /> : null}
 
@@ -241,6 +240,11 @@ function DashboardContent({
             activeBucket={activeBucket}
             onBucketChange={onBucketChange}
             onItemAction={onItemAction}
+          />
+          <PriorityOverview
+            dashboard={dashboard}
+            activeBucket={activeBucket}
+            onBucketChange={onBucketChange}
           />
         </main>
 

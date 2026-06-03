@@ -9,6 +9,7 @@ import { EmptyState } from "../EmptyState";
 import { PageHeader } from "../PageHeader";
 import { VoiceNoteInput } from "../VoiceNoteInput";
 import { useAppData } from "@/hooks/useAppData";
+import { useOpenEntryFromQuery } from "@/hooks/useOpenEntryFromQuery";
 import { nowISO } from "@/lib/dateUtils";
 import type { ChildName } from "@/lib/types";
 
@@ -40,10 +41,16 @@ export function CareManualsPage() {
   const [aiError, setAiError] = useState<string | null>(null);
   const [draftOpen, setDraftOpen] = useState(false);
 
+  useOpenEntryFromQuery(openDraft, "draft");
+
   const manual = useMemo(
     () => data?.careManuals.find((item) => item.child === child),
     [child, data],
   );
+
+  function openDraft() {
+    setDraftOpen(true);
+  }
 
   async function generateManual() {
     setAiBusy(true);
@@ -127,7 +134,7 @@ export function CareManualsPage() {
   return (
     <AppShell>
       <PageHeader eyebrow="Care source of truth" title="Care Manuals">
-        <ActionButton tone="quiet" onClick={() => setDraftOpen(true)}>
+        <ActionButton tone="quiet" onClick={openDraft}>
           <WandSparkles size={16} aria-hidden />
           Generate Draft
         </ActionButton>
@@ -147,9 +154,9 @@ export function CareManualsPage() {
         ))}
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)] xl:items-start">
         {draftOpen ? (
-          <section className="order-1 rounded-3xl border border-[#f5bf7d] bg-[#fff3df] p-4 shadow-sm">
+          <section className="rounded-2xl border border-[#f5bf7d] bg-[#fff3df] p-4 shadow-sm xl:order-2 xl:sticky xl:top-20">
             <div className="mb-3 flex items-center gap-2">
               <ChildBadge child={child} />
               <h2 className="text-lg font-black">Rough notes to manual</h2>
@@ -227,14 +234,14 @@ export function CareManualsPage() {
           </section>
         ) : null}
 
-        <section className={draftOpen ? "order-2 space-y-3" : "space-y-3"}>
+        <section className={draftOpen ? "space-y-3 xl:order-1" : "space-y-3"}>
           {loading || !manual ? (
             <EmptyState text="Loading care manual..." />
           ) : (
             Object.entries(sectionLabels).map(([key, label]) => (
               <label
                 key={key}
-                className="block rounded-3xl border border-[#e8d7bd] bg-white p-4 shadow-sm"
+                className="block rounded-2xl border border-[#e8d7bd] bg-white p-4 shadow-sm"
               >
                 <span className="mb-2 block text-base font-black">{label}</span>
                 <textarea

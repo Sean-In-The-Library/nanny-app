@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireApiSession } from "@/lib/apiAuth";
 import { callOpenRouterJson } from "@/lib/openrouter";
 import { summarizeCareNotesSchema } from "@/lib/schemas";
 
@@ -9,6 +10,11 @@ type CareSummaryResponse = {
 };
 
 export async function POST(request: Request) {
+  const session = await requireApiSession();
+  if (session.response) {
+    return session.response;
+  }
+
   const body = await request.json().catch(() => null);
   const parsed = summarizeCareNotesSchema.safeParse(body);
 
@@ -71,4 +77,3 @@ ${rawNotes}
     );
   }
 }
-
