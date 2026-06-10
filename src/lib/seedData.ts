@@ -6,6 +6,9 @@ export function createSeedData(): AppData {
   const lastDose = new Date(now);
   lastDose.setHours(9, 0, 0, 0);
 
+  const minutesAgo = (minutes: number) =>
+    new Date(now.getTime() - minutes * 60000).toISOString();
+
   return {
     notes: [
       {
@@ -227,6 +230,60 @@ export function createSeedData(): AppData {
         createdAt: nowISO(),
       },
     ],
+    logEvents: [
+      {
+        id: "log-kieran-nap-morning",
+        child: "Kieran",
+        kind: "nap",
+        at: minutesAgo(240),
+        endedAt: minutesAgo(170),
+        recordedBy: "Faith",
+        details: "Went down easily with his books.",
+      },
+      {
+        id: "log-kieran-diaper-after-nap",
+        child: "Kieran",
+        kind: "diaper",
+        at: minutesAgo(165),
+        recordedBy: "Faith",
+        diaperType: "dirty",
+      },
+      {
+        id: "log-kieran-bottle-midday",
+        child: "Kieran",
+        kind: "feed",
+        at: minutesAgo(120),
+        recordedBy: "Faith",
+        feedType: "bottle",
+        amount: "7 oz",
+      },
+      {
+        id: "log-connor-bottle-midday",
+        child: "Connor",
+        kind: "feed",
+        at: minutesAgo(95),
+        recordedBy: "Faith",
+        feedType: "bottle",
+        amount: "6 oz",
+      },
+      {
+        id: "log-connor-diaper-afternoon",
+        child: "Connor",
+        kind: "diaper",
+        at: minutesAgo(45),
+        recordedBy: "Tina",
+        diaperType: "wet",
+      },
+      {
+        id: "log-connor-nap-afternoon",
+        child: "Connor",
+        kind: "nap",
+        at: minutesAgo(25),
+        recordedBy: "Faith",
+        details: "Needed a few minutes of rocking first.",
+      },
+    ],
+    dayDigests: [],
     updatedAt: nowISO(),
   };
 }

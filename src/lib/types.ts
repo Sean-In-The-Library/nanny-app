@@ -152,6 +152,49 @@ export type AdminItem = {
   completedAt?: string;
 };
 
+export type LogEventKind =
+  | "nap"
+  | "feed"
+  | "diaper"
+  | "medication"
+  | "mood"
+  | "activity"
+  | "note";
+
+export type FeedType = "bottle" | "nursing" | "meal" | "snack";
+export type DiaperType = "wet" | "dirty" | "both" | "dry";
+export type MoodType = "happy" | "calm" | "fussy" | "crying" | "sick";
+
+export type LogEvent = {
+  id: string;
+  child: ChildName;
+  kind: LogEventKind;
+  /** ISO timestamp. For naps this is the nap start. */
+  at: string;
+  /** ISO timestamp. Only used for naps; a nap without endedAt is in progress. */
+  endedAt?: string;
+  recordedBy: UserName;
+  details?: string;
+  feedType?: FeedType;
+  /** Free-form amount such as "6 oz" or "most of a jar". */
+  amount?: string;
+  diaperType?: DiaperType;
+  mood?: MoodType;
+  medicineName?: string;
+  dose?: string;
+};
+
+export type DayDigest = {
+  id: string;
+  /** Family-local calendar date, YYYY-MM-DD. */
+  date: string;
+  summary: string;
+  flags: string[];
+  generatedAt: string;
+  generatedBy: UserName;
+  source: "ai" | "local";
+};
+
 export type ActionDraftKind =
   | "note"
   | "chore"
@@ -189,6 +232,8 @@ export type AppData = {
   medicationEntries: MedicationEntry[];
   milestones: Milestone[];
   adminItems: AdminItem[];
+  logEvents: LogEvent[];
+  dayDigests: DayDigest[];
   updatedAt: string;
 };
 

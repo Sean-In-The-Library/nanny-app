@@ -11,6 +11,9 @@ Production target:
 ## What It Does
 
 - Password-gated dashboard for parent/nanny coordination.
+- Day Log at `/day`: one-tap shift logging per child (nap with live timer, bottle/meal/snack, diaper, medication, mood, notes, activities), a timeline with time adjustment and delete, and per-day history browsing. Medication quick-logs also write a Medication page entry so next-dose timing stays tracked.
+- Right Now strip on the dashboard: live per-child nap state, last feed, last diaper, and last medication with next-allowed dose time.
+- AI Day Digest: `/api/ai/daily-digest` turns the day log into a warm end-of-day handoff summary with attention flags through OpenRouter, with a deterministic local fallback when AI is unavailable. The digest appears on the dashboard and the Day Log page.
 - Tina-first dictation flow: dictate live in supported browsers, record/upload for OpenAI `gpt-4o-transcribe`, type as a fallback, convert to reviewable action items, then save selected items.
 - Source-of-truth pages for notes, chores, supplies, trackers, care manuals, development goals, calendar, medication, milestones, and nanny admin reminders.
 - Mobile source pages open in review mode first, with compact add-entry actions that reveal forms only when needed.

@@ -160,6 +160,11 @@ function normalizeAppData(data: Partial<AppData>): AppData {
       : seed.medicationEntries,
     milestones: Array.isArray(data.milestones) ? data.milestones : seed.milestones,
     adminItems: Array.isArray(data.adminItems) ? data.adminItems : seed.adminItems,
+    // Day log fields arrived after launch: stored data without them is real
+    // production data, not a fresh database, so fall back to empty arrays
+    // instead of seed values.
+    logEvents: Array.isArray(data.logEvents) ? data.logEvents : [],
+    dayDigests: Array.isArray(data.dayDigests) ? data.dayDigests : [],
     updatedAt: data.updatedAt ?? seed.updatedAt,
   };
 }

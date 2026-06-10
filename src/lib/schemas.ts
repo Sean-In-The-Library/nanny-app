@@ -16,3 +16,9 @@ export const summarizeCareNotesSchema = z.object({
   rawNotes: z.string().min(10, "Add rough notes first"),
 });
 
+export const dailyDigestSchema = z.object({
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must look like YYYY-MM-DD")
+    .optional(),
+});

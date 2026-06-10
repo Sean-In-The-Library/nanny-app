@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Baby,
   CalendarClock,
   CheckCircle2,
   ClipboardCheck,
@@ -9,6 +10,7 @@ import {
   HeartHandshake,
   HeartPulse,
   ListFilter,
+  Milk,
   PackageOpen,
   Pill,
   Plus,
@@ -17,9 +19,10 @@ import {
   TimerReset,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActionButton } from "../ActionButton";
 import { AppShell } from "../AppShell";
+import { ChildBadge } from "../ChildBadge";
 import { EmptyState } from "../EmptyState";
 import { PageHeader } from "../PageHeader";
 import { PriorityPill } from "../PriorityPill";
@@ -27,14 +30,21 @@ import { QuickActionStrip } from "../QuickActions";
 import { TinaCommandCenter } from "../TinaCommandCenter";
 import { useAppData } from "@/hooks/useAppData";
 import { useSession } from "@/hooks/useSession";
-import { calculateNextDueDate, nowISO } from "@/lib/dateUtils";
+import { calculateNextDueDate, formatDateTime, nowISO } from "@/lib/dateUtils";
 import {
   type DashboardBucket,
   type DashboardData,
   type DashboardItem,
   getDashboardData,
 } from "@/lib/dashboard";
-import type { AppData } from "@/lib/types";
+import {
+  CHILDREN,
+  buildChildDayStatus,
+  eventDateString,
+  formatFamilyTime,
+  todayFamilyDateString,
+} from "@/lib/dayLog";
+import type { AppData, ChildName } from "@/lib/types";
 
 const BUCKETS: Array<{
   key: DashboardBucket;
@@ -228,6 +238,10 @@ function DashboardContent({
           {error}
         </p>
       ) : null}
+
+      <RightNowStrip data={data} />
+
+      <TodayDigestCard data={data} />
 
       <QuickActionStrip mode={isParent ? "parent" : "nanny"} />
 
@@ -566,6 +580,204 @@ function NannyDashboardIntro() {
             child status notes as the day allows.
           </p>
         </div>
+      </div>
+    </section>
+  );
+}
+
+function RightNowStrip({ data }: { data: AppData }) {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setNow(new Date());
+    }, 60000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const today = todayFamilyDateString(now);
+
+  return (
+    <section className="rounded-2xl border border-[#d7c8b4] bg-white p-3 shadow-sm sm:p-4">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <p className="text-xs font-black uppercase tracking-[0.14em] text-[#d97706]">
+          Right now
+        </p>
+        <Link
+          href="/day"
+          className="text-xs font-black text-[#2f83c5] underline-offset-2 hover:underline"
+        >
+          Open Day Log
+        </Link>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        {CHILDREN.map((child) => (
+          <RightNowChildCard
+            key={child}
+            data={data}
+            child={child}
+            now={now}
+            today={today}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RightNowChildCard({
+  data,
+  child,
+  now,
+  today,
+}: {
+  data: AppData;
+  child: ChildName;
+  now: Date;
+  today: string;
+}) {
+  const status = buildChildDayStatus(data, child, now);
+  const liveNapMinutes =
+    status.napping && status.napStartedAt
+      ? Math.max(
+          0,
+          Math.round(
+            (now.getTime() - new Date(status.napStartedAt).getTime()) / 60000,
+          ),
+        )
+      : 0;
+  const med = status.lastMedication;
+  const medGivenToday = med
+    ? eventDateString(med.entry.givenAt) === today
+    : false;
+  const nextDoseWaiting = Boolean(
+    med?.nextAllowedAt &&
+      new Date(med.nextAllowedAt).getTime() > now.getTime(),
+  );
+  const hasAnythingToday = status.eventCount > 0 || medGivenToday;
+
+  return (
+    <Link
+      href="/day"
+      className="block rounded-xl border border-[#eadfcd] bg-[#fffaf0] p-3 transition hover:border-[#2f83c5] hover:bg-[#e8f6fc]"
+    >
+      <span className="flex items-center justify-between gap-2">
+        <ChildBadge child={child} />
+        <span
+          className={`rounded-full px-2 py-1 text-[11px] font-black ${
+            status.napping
+              ? "bg-[#e9e6fb] text-[#46389e]"
+              : "bg-[#fff3df] text-[#7a4b12]"
+          }`}
+        >
+          {status.napping ? `Asleep • ${liveNapMinutes}m` : "Awake"}
+        </span>
+      </span>
+      {hasAnythingToday ? (
+        <span className="mt-2 block space-y-1">
+          <span className="flex items-center gap-1.5 text-xs font-bold text-[#536076]">
+            <Milk size={13} className="shrink-0 text-[#2f83c5]" aria-hidden />
+            <span className="min-w-0 truncate">
+              {status.lastFeed
+                ? `${formatFamilyTime(status.lastFeed.at)} • ${
+                    status.lastFeed.feedType ?? "feed"
+                  }${status.lastFeed.amount ? ` ${status.lastFeed.amount}` : ""}`
+                : "No feeds yet"}
+            </span>
+          </span>
+          <span className="flex items-center gap-1.5 text-xs font-bold text-[#536076]">
+            <Baby size={13} className="shrink-0 text-[#2f83c5]" aria-hidden />
+            <span className="min-w-0 truncate">
+              {status.lastDiaper
+                ? `${formatFamilyTime(status.lastDiaper.at)} • ${
+                    status.lastDiaper.diaperType ?? "changed"
+                  }`
+                : "No diapers yet"}
+            </span>
+          </span>
+          <span className="flex items-center gap-1.5 text-xs font-bold text-[#536076]">
+            <Pill size={13} className="shrink-0 text-[#2f83c5]" aria-hidden />
+            <span className="min-w-0 truncate">
+              {med && (medGivenToday || nextDoseWaiting) ? (
+                <>
+                  {medGivenToday
+                    ? formatFamilyTime(med.entry.givenAt)
+                    : formatDateTime(med.entry.givenAt)}{" "}
+                  • {med.entry.medicineName}
+                  {med.nextAllowedAt ? (
+                    <span
+                      className={nextDoseWaiting ? " text-[#b42318]" : ""}
+                    >
+                      {" "}
+                      • OK after {formatFamilyTime(med.nextAllowedAt)}
+                    </span>
+                  ) : null}
+                </>
+              ) : (
+                "No meds today"
+              )}
+            </span>
+          </span>
+        </span>
+      ) : (
+        <span className="mt-2 block text-xs font-bold leading-5 text-[#667085]">
+          Nothing logged yet today — tap to open the Day Log.
+        </span>
+      )}
+    </Link>
+  );
+}
+
+function TodayDigestCard({ data }: { data: AppData }) {
+  const digest = (data.dayDigests ?? []).find(
+    (entry) => entry.date === todayFamilyDateString(),
+  );
+
+  if (!digest) {
+    return null;
+  }
+
+  return (
+    <section className="rounded-2xl border border-[#f5bf7d] bg-[#fff3df] p-4 shadow-sm">
+      <div className="mb-2 flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.14em] text-[#c75c00]">
+            Today&apos;s digest
+          </p>
+          <h2 className="text-lg font-black text-[#172033]">
+            How the day went
+          </h2>
+        </div>
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#c75c00]">
+          <Sparkles size={18} aria-hidden />
+        </span>
+      </div>
+      <p className="text-sm font-semibold leading-6 text-[#314057]">
+        {digest.summary}
+      </p>
+      {digest.flags.length > 0 ? (
+        <ul className="mt-2 space-y-1">
+          {digest.flags.map((flag) => (
+            <li
+              key={flag}
+              className="rounded-xl bg-white/80 px-3 py-2 text-sm font-bold text-[#7a4b12]"
+            >
+              {flag}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs font-bold text-[#7a4b12]">
+          {digest.source === "ai" ? "AI digest" : "Local digest"} •{" "}
+          {formatDateTime(digest.generatedAt)} • by {digest.generatedBy}
+        </p>
+        <Link
+          href="/day"
+          className="inline-flex min-h-10 items-center justify-center rounded-xl border border-[#e7c188] bg-white px-3 text-sm font-black text-[#7a4b12] transition hover:bg-[#fff7e8]"
+        >
+          Open Day Log
+        </Link>
       </div>
     </section>
   );

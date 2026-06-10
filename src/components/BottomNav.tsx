@@ -12,6 +12,7 @@ import {
   ListChecks,
   MoreHorizontal,
   Sparkles,
+  Sun,
   Syringe,
   X,
 } from "lucide-react";
@@ -22,12 +23,13 @@ import { useSession } from "@/hooks/useSession";
 
 const primaryNavItems = [
   { href: "/", label: "Home", icon: Home },
+  { href: "/day", label: "Day", icon: Sun },
   { href: "/notes", label: "Notes", icon: ClipboardList },
-  { href: "/chores", label: "Chores", icon: ListChecks },
   { href: "/trackers", label: "Track", icon: HeartPulse },
 ];
 
 const secondaryNavItems = [
+  { href: "/chores", label: "Chores", icon: ListChecks },
   { href: "/supplies", label: "Supplies", icon: Boxes },
   { href: "/care-manuals", label: "Care", icon: Baby },
   { href: "/calendar", label: "Dates", icon: CalendarDays },

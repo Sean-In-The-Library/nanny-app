@@ -9,6 +9,7 @@ import {
   Pill,
   Plus,
   Sparkles,
+  Sun,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -19,6 +20,12 @@ import { useSession } from "@/hooks/useSession";
 type QuickActionMode = "parent" | "nanny";
 
 const parentActions = [
+  {
+    href: "/day",
+    label: "Day Log",
+    helper: "Today at a glance",
+    icon: Sun,
+  },
   {
     href: "/notes?new=1",
     label: "Note",
@@ -52,6 +59,12 @@ const parentActions = [
 ];
 
 const nannyActions = [
+  {
+    href: "/day",
+    label: "Day Log",
+    helper: "Open today's log",
+    icon: Sun,
+  },
   {
     href: "/trackers?new=1",
     label: "Status",
@@ -89,7 +102,7 @@ export function QuickActionStrip({ mode }: { mode: QuickActionMode }) {
 
   return (
     <section className="rounded-2xl border border-[#d7c8b4] bg-white p-3 shadow-sm">
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {actions.map((action) => {
           const Icon = action.icon;
           return (
